@@ -1,8 +1,8 @@
 # MiniCode 学习项目
 
-这是一个用于手写 Agent Runtime 和 Coding Agent 的学习项目。
+这是一个本人用于手写 Coding Agent 的学习项目。
 
-运行环境：Python 3.11+
+模仿ClaudeCode架构
 
 目标不是一次性写出完整工具，而是在引导下逐步实现：
 
@@ -20,8 +20,3 @@
 3. 你先手写代码，我再帮你 review、纠错、补测试。
 4. 每次修改后，在 `docs/SDD.md` 的“做了什么”里补一句自然语言记录。
 
-## 当前阶段
-
-从 Day 01 开始：先手写 MiniCode 的核心数据模型。
-
-文档：[Day 01 Runtime Models](docs/day01_runtime_models.md)
