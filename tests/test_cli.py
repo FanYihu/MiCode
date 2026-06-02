@@ -1,7 +1,14 @@
 from pathlib import Path
 
 from minicode.agent import AgentAction
-from minicode.cli import maybe_save_trace, run_agent_task, run_task
+from minicode.cli import (
+    maybe_save_trace,
+    run_agent_task,
+    run_task,
+    run_trace_cleanup,
+    run_trace_list,
+    run_trace_viewer,
+)
 from minicode.models import RunStatus, StepType
 
 
@@ -14,6 +21,9 @@ def test_cli_list_files(tmp_path):
     assert trace["steps"][0]["type"] == StepType.TOOL.value
     assert trace["steps"][0]["metadata"]["tool"] == "list_files"
     assert "README.md" in trace["events"][0]["content"]
+    assert trace["run"]["metadata"]["task"] == "list files"
+    assert trace["run"]["metadata"]["mode"] == "fixed"
+    assert trace["run"]["metadata"]["workspace"] == str(tmp_path)
 
 
 def test_cli_unsupported_task_completes_with_message(tmp_path):
@@ -77,3 +87,62 @@ def test_run_agent_task_uses_configured_llm(monkeypatch, tmp_path):
     assert trace["run"]["status"] == RunStatus.COMPLETED.value
     assert trace["steps"][0]["metadata"]["tool"] == "list_files"
     assert trace["events"][-1]["content"] == "完成"
+    assert trace["run"]["metadata"]["task"] == "列出文件"
+    assert trace["run"]["metadata"]["mode"] == "agent"
+    assert trace["run"]["metadata"]["workspace"] == str(tmp_path)
+    assert trace["run"]["metadata"]["config"] == "config.toml"
+
+
+def test_run_trace_viewer_returns_summary(tmp_path):
+    trace_path = tmp_path / "trace.json"
+    trace_path.write_text(
+        '{"run":{"status":"completed"},"steps":[],"events":[]}',
+        encoding="utf-8",
+    )
+
+    summary = run_trace_viewer(str(trace_path))
+
+    assert "Run: completed" in summary
+    assert "Steps: 0" in summary
+
+
+def test_run_trace_list_returns_numbered_paths(tmp_path):
+    trace_dir = tmp_path / "traces"
+    trace_dir.mkdir()
+    trace_path = trace_dir / "trace.json"
+    trace_path.write_text("{}", encoding="utf-8")
+
+    output = run_trace_list(str(trace_dir), limit=10)
+
+    assert output == f"1. {trace_path}"
+
+
+def test_run_trace_list_returns_message_when_empty(tmp_path):
+    output = run_trace_list(str(tmp_path / "missing"), limit=10)
+
+    assert output == "No traces found."
+
+
+def test_run_trace_cleanup_returns_deleted_count(tmp_path):
+    trace_dir = tmp_path / "traces"
+    trace_dir.mkdir()
+    old_trace = trace_dir / "old.json"
+    new_trace = trace_dir / "new.json"
+    old_trace.write_text("{}", encoding="utf-8")
+    new_trace.write_text("{}", encoding="utf-8")
+
+    import os
+    os.utime(old_trace, (1000, 1000))
+    os.utime(new_trace, (2000, 2000))
+
+    output = run_trace_cleanup(str(trace_dir), keep=1)
+
+    assert output == "Deleted 1 trace files."
+    assert not old_trace.exists()
+    assert new_trace.exists()
+
+
+def test_run_trace_cleanup_returns_empty_message(tmp_path):
+    output = run_trace_cleanup(str(tmp_path / "missing"), keep=20)
+
+    assert output == "No trace files deleted."

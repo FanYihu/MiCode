@@ -3,7 +3,13 @@ import json
 
 from minicode.agent import MiniCodeAgent, create_llm_from_config
 from minicode.models import EventType, Run, StepType
-from minicode.persistence import save_trace
+from minicode.persistence import (
+    cleanup_traces,
+    load_trace,
+    list_traces,
+    save_trace,
+    summarize_trace,
+)
 from minicode.permissions import PermissionDecision, PermissionReviewer
 from minicode.shell_tools import ShellTools
 from minicode.trace import TraceRecorder
@@ -13,6 +19,9 @@ from minicode.workspace import Workspace
 def run_task(task: str, workspace_path: str) -> dict:
     """执行一个固定 CLI 任务，并返回可序列化的 trace。"""
     run = Run()
+    run.metadata["task"] = task
+    run.metadata["mode"] = "fixed"
+    run.metadata["workspace"] = workspace_path
     trace = TraceRecorder(run)
     workspace = Workspace(workspace_path)
 
@@ -79,10 +88,15 @@ def run_task(task: str, workspace_path: str) -> dict:
     return trace.to_dict()
 
 def run_agent_task(task: str, workspace_path: str, config_path: str) -> dict:
+    """用 config.toml 创建 LLM，并运行 Agent Loop。"""
     workspace = Workspace(workspace_path)
     llm = create_llm_from_config(config_path)
     agent = MiniCodeAgent(workspace, llm)
-    return agent.run(task)
+    trace = agent.run(task)
+    # workspace/config 是 CLI 入口补充的运行上下文，不让 Agent 直接关心命令行参数。
+    trace["run"]["metadata"]["workspace"] = workspace_path
+    trace["run"]["metadata"]["config"] = config_path
+    return trace
 
 
 def maybe_save_trace(trace: dict, should_save: bool, output_dir: str) -> dict:
@@ -91,8 +105,31 @@ def maybe_save_trace(trace: dict, should_save: bool, output_dir: str) -> dict:
         trace["saved_trace_path"] = save_trace(trace, output_dir=output_dir)
     return trace
 
+
+def run_trace_viewer(trace_path: str) -> str:
+    """读取已保存 trace，并返回适合终端展示的摘要文本。"""
+    return summarize_trace(load_trace(trace_path))
+
+
+def run_trace_list(trace_dir: str, limit: int) -> str:
+    """列出最近 trace 文件；CLI 层负责把路径列表格式化成文本。"""
+    paths = list_traces(trace_dir=trace_dir, limit=limit)
+    if not paths:
+        return "No traces found."
+
+    return "\n".join(f"{index}. {path}" for index, path in enumerate(paths, start=1))
+
+
+def run_trace_cleanup(trace_dir: str, keep: int) -> str:
+    """清理旧 trace；CLI 只展示结果，不隐藏底层删除策略。"""
+    deleted = cleanup_traces(trace_dir=trace_dir, keep=keep)
+    if not deleted:
+        return "No trace files deleted."
+
+    return f"Deleted {len(deleted)} trace files."
+
 def main() -> None:
-    """解析命令行参数并把 trace JSON 打印到 stdout。"""
+    """解析命令行参数，并根据模式输出 JSON trace 或摘要文本。"""
     parser = argparse.ArgumentParser(description="MiniCode CLI")
     subparsers = parser.add_subparsers(dest="mode", required=True)
 
@@ -109,14 +146,33 @@ def main() -> None:
     agent_parser.add_argument("--save-trace", action="store_true")
     agent_parser.add_argument("--trace-dir", default=".minicode/traces")
 
+    trace_parser = subparsers.add_parser("trace")
+    trace_parser.add_argument("path")
+
+    traces_parser = subparsers.add_parser("traces")
+    traces_parser.add_argument("--trace-dir", default=".minicode/traces")
+    traces_parser.add_argument("--limit", type=int, default=10)
+
+    cleanup_parser = subparsers.add_parser("cleanup-traces")
+    cleanup_parser.add_argument("--trace-dir", default=".minicode/traces")
+    cleanup_parser.add_argument("--keep", type=int, default=20)
+
     args = parser.parse_args()
 
     if args.mode == "fixed":
-     trace = run_task(args.task, args.workspace)
+        trace = run_task(args.task, args.workspace)
+        trace = maybe_save_trace(trace, args.save_trace, args.trace_dir)
+        print(json.dumps(trace, ensure_ascii=False, indent=2))
     elif args.mode == "agent":
-     trace = run_agent_task(args.task, args.workspace, args.config)
-    trace = maybe_save_trace(trace, args.save_trace, args.trace_dir)
-    print(json.dumps(trace, ensure_ascii=False, indent=2))
+        trace = run_agent_task(args.task, args.workspace, args.config)
+        trace = maybe_save_trace(trace, args.save_trace, args.trace_dir)
+        print(json.dumps(trace, ensure_ascii=False, indent=2))
+    elif args.mode == "trace":
+        print(run_trace_viewer(args.path))
+    elif args.mode == "traces":
+        print(run_trace_list(args.trace_dir, args.limit))
+    elif args.mode == "cleanup-traces":
+        print(run_trace_cleanup(args.trace_dir, args.keep))
 
 
 if __name__ == "__main__":

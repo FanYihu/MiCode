@@ -194,6 +194,18 @@ class MiniCodeAgent:
     def run(self, task: str) -> dict:
          # 创建运行实例和轨迹记录器
         run = Run()
+        run.metadata["task"] = task
+        run.metadata["mode"] = "agent"
+
+        # provider/model 属于整次模型驱动运行的上下文，记录在 Run metadata 里方便复盘。
+        client = getattr(self.llm, "client", None)
+        provider = getattr(client, "provider", "")
+        model = getattr(client, "model", "")
+        if provider:
+            run.metadata["provider"] = provider
+        if model:
+            run.metadata["model"] = model
+
         trace = TraceRecorder(run)
          
         # 标记任务开始执行

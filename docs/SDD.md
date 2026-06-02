@@ -54,6 +54,10 @@
 - Day 19：LLM Error Handling 与 Trace
 - Day 20：Trace Persistence
 - Day 21：Trace Viewer
+- Day 22：Trace List
+- Day 23：Trace Cleanup
+- Day 24：Run Metadata
+- Day 25：Trace Metadata Filter
 
 ## 做了什么
 
@@ -96,3 +100,11 @@
 - 2026-06-02：进入 Day 20 Trace Persistence 学习，准备把运行 trace 保存为本地 JSON 文件便于复盘。
 - 2026-06-02：完成 Day 20 Trace Persistence，新增 save_trace、CLI --save-trace 和相关测试，确认 59 个测试通过。
 - 2026-06-02：进入 Day 21 Trace Viewer 学习，准备从保存的 trace JSON 生成可读复盘摘要。
+- 2026-06-02：完成 Day 21 Trace Viewer，新增 load_trace、summarize_trace 和 CLI trace 子命令，确认 63 个测试通过。
+- 2026-06-02：进入 Day 22 Trace List 学习，准备在 CLI 中列出最近保存的 trace 文件。
+- 2026-06-02：完成 Day 22 Trace List，新增 list_traces 和 CLI traces 子命令，确认 68 个测试通过。
+- 2026-06-02：进入 Day 23 Trace Cleanup 学习，准备清理旧 trace 文件，避免运行产物无限增长。
+- 2026-06-02：完成 Day 23 Trace Cleanup，新增 cleanup_traces 和 CLI cleanup-traces 子命令，确认 74 个测试通过。
+- 2026-06-02：进入 Day 24 Run Metadata 学习，准备把 task、mode、workspace、provider 和 model 写入 run metadata。
+- 2026-06-02：完成 Day 24 Run Metadata，新增 run metadata 导出与 fixed/agent 运行上下文记录，确认 75 个测试通过。
+- 2026-06-02：进入 Day 25 Trace Metadata Filter 学习，准备按 mode、provider、model 和 task 关键词筛选 trace。

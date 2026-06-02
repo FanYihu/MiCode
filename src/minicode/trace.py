@@ -46,6 +46,7 @@ class TraceRecorder:
                 "status": self.run.status.value,
                 "created_at": self.run.created_at.isoformat(),
                 "updated_at": self.run.updated_at.isoformat(),
+                "metadata": self.run.metadata,
             },
             "steps": [
                 {

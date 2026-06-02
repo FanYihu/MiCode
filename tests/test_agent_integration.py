@@ -57,6 +57,29 @@ def test_agent_reads_file_then_finishes(tmp_path):
     ]
     assert "hello minicode" in trace["events"][0]["content"]
     assert trace["events"][-1]["content"] == "读取完成"
+    assert trace["run"]["metadata"]["task"] == "read README"
+    assert trace["run"]["metadata"]["mode"] == "agent"
+
+
+def test_agent_records_provider_and_model_metadata(tmp_path):
+    class Client:
+        provider = "mimo"
+        model = "mimo-v2.5-pro"
+
+    class LLM:
+        def __init__(self):
+            self.client = Client()
+            self.actions = [AgentAction(tool="", args={"answer": "完成"}, final=True)]
+
+        def next_action(self, task, observations):
+            return self.actions.pop(0)
+
+    agent = MiniCodeAgent(Workspace(str(tmp_path)), LLM())
+
+    trace = agent.run("metadata test")
+
+    assert trace["run"]["metadata"]["provider"] == "mimo"
+    assert trace["run"]["metadata"]["model"] == "mimo-v2.5-pro"
 
 
 def test_agent_denies_dangerous_shell_command(tmp_path):

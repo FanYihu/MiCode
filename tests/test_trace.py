@@ -38,6 +38,7 @@ def test_add_event_belongs_to_step():
 
 def test_trace_to_dict_contains_run_steps_events():
     run = Run()
+    run.metadata["task"] = "read README"
     recorder = TraceRecorder(run)
     step = recorder.add_step(StepType.TOOL, metadata={"name": "read_file"})
     recorder.add_event(step, EventType.TOOL_CALL, content="read README")
@@ -46,6 +47,7 @@ def test_trace_to_dict_contains_run_steps_events():
 
     assert trace["run"]["id"] == run.id
     assert trace["run"]["status"] == run.status.value
+    assert trace["run"]["metadata"] == {"task": "read README"}
     assert trace["steps"][0]["id"] == step.id
     assert trace["steps"][0]["metadata"] == {"name": "read_file"}
     assert trace["events"][0]["step_id"] == step.id
