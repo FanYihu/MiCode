@@ -1,0 +1,27 @@
+# MiniCode 学习项目
+
+这是一个用于手写 Agent Runtime 和 Coding Agent 的学习项目。
+
+运行环境：Python 3.11+
+
+目标不是一次性写出完整工具，而是在引导下逐步实现：
+
+- Run / Step / Event 状态模型
+- CLI 任务入口
+- 文件读取、搜索、补丁应用工具
+- 命令执行工具
+- 人工确认与危险操作拦截
+- 执行 trace 与测试
+
+## 学习方式
+
+1. 先读 `docs/SDD.md`，明确为什么做、做什么、怎么做。
+2. 每次只完成一个很小的模块。
+3. 你先手写代码，我再帮你 review、纠错、补测试。
+4. 每次修改后，在 `docs/SDD.md` 的“做了什么”里补一句自然语言记录。
+
+## 当前阶段
+
+从 Day 01 开始：先手写 MiniCode 的核心数据模型。
+
+文档：[Day 01 Runtime Models](docs/day01_runtime_models.md)

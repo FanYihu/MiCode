@@ -1,0 +1,5 @@
+[llm]
+provider = "mimo"
+model = "mimo-v2.5-pro"
+base_url = "https://api.xiaomimimo.com/v1"
+api_key = "sk-c55n2as76ylk6c170ieps5dkmpumo7shftvi8j41h5jl7igb"
