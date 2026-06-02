@@ -53,6 +53,7 @@
 - Day 18：CLI Agent Mode
 - Day 19：LLM Error Handling 与 Trace
 - Day 20：Trace Persistence
+- Day 21：Trace Viewer
 
 ## 做了什么
 
@@ -93,3 +94,5 @@
 - 2026-06-02：进入 Day 19 LLM Error Handling 与 Trace 学习，准备把模型调用和 action 解析失败记录进 trace。
 - 2026-06-02：完成 Day 19 LLM 错误处理，新增 LLMError、模型错误 trace 记录和客户端异常包装，确认 55 个测试通过。
 - 2026-06-02：进入 Day 20 Trace Persistence 学习，准备把运行 trace 保存为本地 JSON 文件便于复盘。
+- 2026-06-02：完成 Day 20 Trace Persistence，新增 save_trace、CLI --save-trace 和相关测试，确认 59 个测试通过。
+- 2026-06-02：进入 Day 21 Trace Viewer 学习，准备从保存的 trace JSON 生成可读复盘摘要。

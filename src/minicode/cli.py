@@ -3,6 +3,7 @@ import json
 
 from minicode.agent import MiniCodeAgent, create_llm_from_config
 from minicode.models import EventType, Run, StepType
+from minicode.persistence import save_trace
 from minicode.permissions import PermissionDecision, PermissionReviewer
 from minicode.shell_tools import ShellTools
 from minicode.trace import TraceRecorder
@@ -83,6 +84,13 @@ def run_agent_task(task: str, workspace_path: str, config_path: str) -> dict:
     agent = MiniCodeAgent(workspace, llm)
     return agent.run(task)
 
+
+def maybe_save_trace(trace: dict, should_save: bool, output_dir: str) -> dict:
+    """按 CLI 参数决定是否保存 trace，并把保存路径放进输出。"""
+    if should_save:
+        trace["saved_trace_path"] = save_trace(trace, output_dir=output_dir)
+    return trace
+
 def main() -> None:
     """解析命令行参数并把 trace JSON 打印到 stdout。"""
     parser = argparse.ArgumentParser(description="MiniCode CLI")
@@ -91,11 +99,15 @@ def main() -> None:
     fixed_parser = subparsers.add_parser("fixed")
     fixed_parser.add_argument("task")
     fixed_parser.add_argument("--workspace", default=".")
+    fixed_parser.add_argument("--save-trace", action="store_true")
+    fixed_parser.add_argument("--trace-dir", default=".minicode/traces")
 
     agent_parser = subparsers.add_parser("agent")
     agent_parser.add_argument("task")
     agent_parser.add_argument("--workspace", default=".")
     agent_parser.add_argument("--config", default="config.toml")
+    agent_parser.add_argument("--save-trace", action="store_true")
+    agent_parser.add_argument("--trace-dir", default=".minicode/traces")
 
     args = parser.parse_args()
 
@@ -103,6 +115,7 @@ def main() -> None:
      trace = run_task(args.task, args.workspace)
     elif args.mode == "agent":
      trace = run_agent_task(args.task, args.workspace, args.config)
+    trace = maybe_save_trace(trace, args.save_trace, args.trace_dir)
     print(json.dumps(trace, ensure_ascii=False, indent=2))
 
 
