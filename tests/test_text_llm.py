@@ -35,6 +35,17 @@ def test_text_llm_includes_observations_in_prompt():
     assert "README 内容" in client.prompts[0]
 
 
+def test_text_llm_uses_injected_tool_descriptions():
+    client = FakeTextClient(['{"tool":"echo","args":{"text":"hi"},"final":false}'])
+    llm = TextLLM(client)
+
+    llm.set_tool_descriptions(["- echo: echo text, args={\"text\": \"...\"}"])
+    llm.next_action("回显", [])
+
+    assert "echo: echo text" in client.prompts[0]
+    assert "list_files" not in client.prompts[0]
+
+
 def test_text_llm_raises_for_invalid_json():
     client = FakeTextClient(["not json"])
     llm = TextLLM(client)

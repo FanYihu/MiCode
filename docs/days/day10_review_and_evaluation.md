@@ -33,13 +33,13 @@ Day 10 要确认三件事：
 ```text
 minicode/
   docs/
-    architecture.md
-    stage1_review.md
+    stage1/
+      README.md
   tests/
     test_agent_integration.py
 ```
 
-## architecture.md 建议内容
+## Stage 1 架构建议内容
 
 保持短小，写清楚：
 
@@ -62,7 +62,7 @@ minicode/
 ## 后续扩展点
 ```
 
-## stage1_review.md 建议内容
+## Stage 1 复盘建议内容
 
 写学习复盘，不要太长：
 

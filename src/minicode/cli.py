@@ -5,10 +5,14 @@ from minicode.agent import MiniCodeAgent, create_llm_from_config
 from minicode.models import EventType, Run, StepType
 from minicode.persistence import (
     cleanup_traces,
+    filter_traces,
+    format_trace_detail,
+    format_trace_markdown,
     load_trace,
     list_traces,
     save_trace,
     summarize_trace,
+    write_text_report,
 )
 from minicode.permissions import PermissionDecision, PermissionReviewer
 from minicode.shell_tools import ShellTools
@@ -106,14 +110,45 @@ def maybe_save_trace(trace: dict, should_save: bool, output_dir: str) -> dict:
     return trace
 
 
-def run_trace_viewer(trace_path: str) -> str:
-    """读取已保存 trace，并返回适合终端展示的摘要文本。"""
-    return summarize_trace(load_trace(trace_path))
+def run_trace_viewer(
+    trace_path: str,
+    detail: bool = False,
+    max_content: int = 2000,
+    markdown: bool = False,
+    output: str = "",
+) -> str:
+    """读取已保存 trace，并按参数返回摘要或详细视图。"""
+    trace = load_trace(trace_path)
+    if markdown:
+        report = format_trace_markdown(trace)
+        if output:
+            # CLI 只返回用户需要看的保存结果，具体写文件动作交给 persistence 层。
+            saved_path = write_text_report(report, output)
+            return f"Markdown report saved to {saved_path}"
+        return report
+    if detail:
+        return format_trace_detail(trace, max_content=max_content)
+    return summarize_trace(trace)
 
 
-def run_trace_list(trace_dir: str, limit: int) -> str:
+def run_trace_list(
+    trace_dir: str,
+    limit: int,
+    mode: str = "",
+    provider: str = "",
+    model: str = "",
+    task_contains: str = "",
+) -> str:
     """列出最近 trace 文件；CLI 层负责把路径列表格式化成文本。"""
-    paths = list_traces(trace_dir=trace_dir, limit=limit)
+    # 先多取一些候选，再过滤并截断，避免过滤前 limit 过小漏掉匹配项。
+    candidates = list_traces(trace_dir=trace_dir, limit=10_000)
+    paths = filter_traces(
+        candidates,
+        mode=mode,
+        provider=provider,
+        model=model,
+        task_contains=task_contains,
+    )[:limit]
     if not paths:
         return "No traces found."
 
@@ -131,7 +166,7 @@ def run_trace_cleanup(trace_dir: str, keep: int) -> str:
 def main() -> None:
     """解析命令行参数，并根据模式输出 JSON trace 或摘要文本。"""
     parser = argparse.ArgumentParser(description="MiniCode CLI")
-    subparsers = parser.add_subparsers(dest="mode", required=True)
+    subparsers = parser.add_subparsers(dest="command", required=True)
 
     fixed_parser = subparsers.add_parser("fixed")
     fixed_parser.add_argument("task")
@@ -148,10 +183,18 @@ def main() -> None:
 
     trace_parser = subparsers.add_parser("trace")
     trace_parser.add_argument("path")
+    trace_parser.add_argument("--detail", action="store_true")
+    trace_parser.add_argument("--max-content", type=int, default=2000)
+    trace_parser.add_argument("--markdown", action="store_true")
+    trace_parser.add_argument("--output", default="")
 
     traces_parser = subparsers.add_parser("traces")
     traces_parser.add_argument("--trace-dir", default=".minicode/traces")
     traces_parser.add_argument("--limit", type=int, default=10)
+    traces_parser.add_argument("--mode", default="")
+    traces_parser.add_argument("--provider", default="")
+    traces_parser.add_argument("--model", default="")
+    traces_parser.add_argument("--task-contains", default="")
 
     cleanup_parser = subparsers.add_parser("cleanup-traces")
     cleanup_parser.add_argument("--trace-dir", default=".minicode/traces")
@@ -159,19 +202,36 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    if args.mode == "fixed":
+    if args.command == "fixed":
         trace = run_task(args.task, args.workspace)
         trace = maybe_save_trace(trace, args.save_trace, args.trace_dir)
         print(json.dumps(trace, ensure_ascii=False, indent=2))
-    elif args.mode == "agent":
+    elif args.command == "agent":
         trace = run_agent_task(args.task, args.workspace, args.config)
         trace = maybe_save_trace(trace, args.save_trace, args.trace_dir)
         print(json.dumps(trace, ensure_ascii=False, indent=2))
-    elif args.mode == "trace":
-        print(run_trace_viewer(args.path))
-    elif args.mode == "traces":
-        print(run_trace_list(args.trace_dir, args.limit))
-    elif args.mode == "cleanup-traces":
+    elif args.command == "trace":
+        print(
+            run_trace_viewer(
+                args.path,
+                detail=args.detail,
+                max_content=args.max_content,
+                markdown=args.markdown,
+                output=args.output,
+            )
+        )
+    elif args.command == "traces":
+        print(
+            run_trace_list(
+                args.trace_dir,
+                args.limit,
+                mode=args.mode,
+                provider=args.provider,
+                model=args.model,
+                task_contains=args.task_contains,
+            )
+        )
+    elif args.command == "cleanup-traces":
         print(run_trace_cleanup(args.trace_dir, args.keep))
 
 

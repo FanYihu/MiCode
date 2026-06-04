@@ -38,16 +38,22 @@ def test_parse_json_array_raises():
         parse_action("[]")
 
 
-def test_read_file_missing_path_raises():
-    with pytest.raises(InvalidAgentAction):
-        parse_action('{"tool":"read_file","args":{},"final":false}')
+def test_read_file_missing_path_is_left_for_tool_registry():
+    action = parse_action('{"tool":"read_file","args":{},"final":false}')
+
+    assert action.tool == "read_file"
+    assert action.args == {}
 
 
-def test_run_shell_missing_command_raises():
-    with pytest.raises(InvalidAgentAction):
-        parse_action('{"tool":"run_shell","args":{},"final":false}')
+def test_run_shell_missing_command_is_left_for_tool_registry():
+    action = parse_action('{"tool":"run_shell","args":{},"final":false}')
+
+    assert action.tool == "run_shell"
+    assert action.args == {}
 
 
-def test_unknown_tool_raises():
-    with pytest.raises(InvalidAgentAction):
-        parse_action('{"tool":"unknown","args":{},"final":false}')
+def test_unknown_tool_is_left_for_tool_registry():
+    action = parse_action('{"tool":"unknown","args":{},"final":false}')
+
+    assert action.tool == "unknown"
+    assert action.args == {}

@@ -1,13 +1,11 @@
 from dataclasses import dataclass
 import json
 import os
-from typing import Dict
+from typing import Dict, Optional
 
-from minicode.file_tools import FileTools
 from minicode.models import EventType, Run, StepType
-from minicode.permissions import PermissionDecision, PermissionReviewer
-from minicode.shell_tools import CommandResult, ShellTools
 from minicode.trace import TraceRecorder
+from minicode.tool_registry import ToolRegistry, create_default_tool_registry
 from minicode.workspace import Workspace
 import tomli as tomllib
 
@@ -68,17 +66,28 @@ def parse_action(text: str) -> AgentAction:
     validate_action(action)
     return action
 
+DEFAULT_TOOL_DESCRIPTIONS = [
+    "- list_files: list workspace files, args={}",
+    '- read_file: read a file, args={"path": "..."}',
+    '- replace_text: replace exact text once, args={"path": "...", "old": "...", "new": "..."}',
+    '- run_shell: run a shell command, args={"command": "..."}',
+]
+
+
 #构建 LLM 输入提示语，包含任务描述和观察结果
-def build_action_prompt(task: str, observations: list[str]) -> str:
+def build_action_prompt(
+    task: str,
+    observations: list[str],
+    tool_descriptions: Optional[list[str]] = None,
+) -> str:
     observation_text = "\n\n".join(observations) if observations else "None"
+    tool_text = "\n".join(tool_descriptions or DEFAULT_TOOL_DESCRIPTIONS)
 
     return f"""
 You are MiniCode's action generator.
 
 Available tools:
-- list_files: list workspace files, args={{}}
-- read_file: read a file, args={{"path": "..."}}
-- run_shell: run a shell command, args={{"command": "..."}}
+{tool_text}
 
 Return exactly one JSON object.
 Do not return markdown.
@@ -104,20 +113,11 @@ def validate_action(action: AgentAction) -> None:
     if action.final:
         return
 
-    if action.tool == "list_files":
-        return
+    if not action.tool:
+        raise InvalidAgentAction("action tool is required")
 
-    if action.tool == "read_file":
-        if "path" not in action.args:
-            raise InvalidAgentAction("read_file requires path")
-        return
-
-    if action.tool == "run_shell":
-        if "command" not in action.args:
-            raise InvalidAgentAction("run_shell requires command")
-        return
-
-    raise InvalidAgentAction(f"unknown tool: {action.tool}")     
+    # 工具是否存在、参数是否完整交给 ToolRegistry 和具体工具处理。
+    return
        
 #模拟 LLMs 输出的指令，用于测试 Agent Loop 的执行逻辑
 class MockLLM:
@@ -136,9 +136,13 @@ class MockLLM:
 class TextLLM:
     def __init__(self, client) -> None:
         self.client = client
+        self.tool_descriptions = DEFAULT_TOOL_DESCRIPTIONS
+
+    def set_tool_descriptions(self, tool_descriptions: list[str]) -> None:
+        self.tool_descriptions = tool_descriptions
 
     def next_action(self, task: str, observations: list[str]) -> AgentAction:
-        prompt = build_action_prompt(task, observations)
+        prompt = build_action_prompt(task, observations, self.tool_descriptions)
         text = self.client.generate(prompt)
         return parse_action(text)         
 
@@ -187,9 +191,17 @@ class FakeClient:
 
 #主流程：MiniCodeAgent 类，负责执行任务并记录执行轨迹
 class MiniCodeAgent:
-    def __init__(self, workspace: Workspace, llm) -> None:
+    def __init__(
+        self,
+        workspace: Workspace,
+        llm,
+        tool_registry: Optional[ToolRegistry] = None,
+    ) -> None:
         self.workspace = workspace
         self.llm = llm
+        self.tool_registry = tool_registry or create_default_tool_registry(workspace)
+        if hasattr(self.llm, "set_tool_descriptions"):
+            self.llm.set_tool_descriptions(self.tool_registry.describe_tools())
 
     def run(self, task: str) -> dict:
          # 创建运行实例和轨迹记录器
@@ -231,61 +243,20 @@ class MiniCodeAgent:
             )
             return trace.to_dict()
           
-          step = trace.add_step(StepType.TOOL,metadata={"tool": action.tool},)
+          step = trace.add_step(
+              StepType.TOOL,
+              metadata={"tool": action.tool, "args": action.args},
+          )
 
-          if action.tool == "list_files":
-            result = self.workspace.list_files()
-            observations.append("\n".join(result))
-            trace.add_event(
-               step,
-               EventType.TEXT,
-               content="\n".join(result),
-               metadata={"files": result}, 
-               )
-                
-          elif action.tool == "read_file":
-            tool = FileTools(self.workspace)
-            result = tool.read_file(action.args["path"])
-            observations.append(result)
-            trace.add_event(
-                step,
-                EventType.TEXT,
-                content=result,
-                metadata={"path": action.args["path"]},
-                )
-                
-          elif action.tool == "run_shell":
-            tool = ShellTools(self.workspace)
-            review = PermissionReviewer().review_shell_command(action.args["command"])
-            if review.decision == PermissionDecision.ALLOW:
-                trace.add_event(
-                    step,
-                    EventType.TEXT,
-                    content="开始运行命令..."
-                )
-            else:
-                run.fail()
-                trace.add_event(
-                    step,
-                    EventType.TEXT,
-                    content="权限不足，无法运行命令"
-                )
-                return trace.to_dict()
-            result : CommandResult = tool.run(action.args["command"])
-            observations.append(result.stdout or result.stderr)
-            trace.add_event(
-                    step,
-                    EventType.TEXT,
-                    content=result.stdout,
-                    metadata={
-                        "command": action.args["command"],
-                        "exit_code": result.exit_code,
-                        "stderr": result.stderr,
-                        "timed_out": result.timed_out
-                    },
-                )
-          else:
-            trace.add_event(step, EventType.ERROR, content=f"未知工具：{action.tool}")
+          result = self.tool_registry.call(action.tool, action.args)
+          observations.append(result.output)
+          trace.add_event(
+              step,
+              EventType.TOOL_CALL if result.ok else EventType.ERROR,
+              content=result.output,
+              metadata=result.metadata,
+          )
+          if not result.ok:
             run.fail()
             return trace.to_dict()
         

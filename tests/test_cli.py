@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 from minicode.agent import AgentAction
@@ -106,11 +107,123 @@ def test_run_trace_viewer_returns_summary(tmp_path):
     assert "Steps: 0" in summary
 
 
+def test_run_trace_viewer_returns_detail_when_requested(tmp_path):
+    trace_path = tmp_path / "trace.json"
+    trace_path.write_text(
+        '{"run":{"id":"run-1","status":"completed","metadata":{"task":"读取 README"}},"steps":[],"events":[]}',
+        encoding="utf-8",
+    )
+
+    detail = run_trace_viewer(str(trace_path), detail=True)
+
+    assert "Run" in detail
+    assert "run-1" in detail
+    assert '"task": "读取 README"' in detail
+
+
+def test_run_trace_viewer_detail_respects_max_content(tmp_path):
+    trace_path = tmp_path / "trace.json"
+    trace = {
+        "run": {"id": "run-1", "status": "completed", "metadata": {}},
+        "steps": [],
+        "events": [
+            {
+                "type": "text",
+                "step_id": "step-1",
+                "content": "abcdef",
+                "metadata": {},
+            }
+        ],
+    }
+    trace_path.write_text(json.dumps(trace), encoding="utf-8")
+
+    detail = run_trace_viewer(str(trace_path), detail=True, max_content=3)
+
+    assert "content: abc... [truncated]" in detail
+
+
+def test_run_trace_viewer_detail_can_disable_content_truncation(tmp_path):
+    trace_path = tmp_path / "trace.json"
+    trace = {
+        "run": {"id": "run-1", "status": "completed", "metadata": {}},
+        "steps": [],
+        "events": [
+            {
+                "type": "text",
+                "step_id": "step-1",
+                "content": "abcdef",
+                "metadata": {},
+            }
+        ],
+    }
+    trace_path.write_text(json.dumps(trace), encoding="utf-8")
+
+    detail = run_trace_viewer(str(trace_path), detail=True, max_content=0)
+
+    assert "content: abcdef" in detail
+    assert "[truncated]" not in detail
+
+
+def test_run_trace_viewer_returns_markdown_when_requested(tmp_path):
+    trace_path = tmp_path / "trace.json"
+    trace = {
+        "run": {
+            "status": "completed",
+            "metadata": {"task": "读取 README", "mode": "agent"},
+        },
+        "steps": [{"type": "final", "metadata": {}}],
+        "events": [{"type": "text", "content": "完成"}],
+    }
+    trace_path.write_text(json.dumps(trace), encoding="utf-8")
+
+    report = run_trace_viewer(str(trace_path), markdown=True)
+
+    assert report.startswith("# MiniCode Trace Report")
+    assert "- task: 读取 README" in report
+    assert "1. final" in report
+    assert "完成" in report
+
+
+def test_run_trace_viewer_saves_markdown_when_output_is_provided(tmp_path):
+    trace_path = tmp_path / "trace.json"
+    output_path = tmp_path / "reports" / "trace.md"
+    trace = {
+        "run": {
+            "status": "completed",
+            "metadata": {"task": "读取 README", "mode": "agent"},
+        },
+        "steps": [{"type": "final", "metadata": {}}],
+        "events": [{"type": "text", "content": "完成"}],
+    }
+    trace_path.write_text(json.dumps(trace), encoding="utf-8")
+
+    output = run_trace_viewer(str(trace_path), markdown=True, output=str(output_path))
+
+    assert output == f"Markdown report saved to {output_path}"
+    assert output_path.exists()
+    assert "# MiniCode Trace Report" in output_path.read_text(encoding="utf-8")
+
+
+def test_run_trace_viewer_markdown_takes_priority_over_detail(tmp_path):
+    trace_path = tmp_path / "trace.json"
+    trace = {
+        "run": {"id": "run-1", "status": "completed", "metadata": {}},
+        "steps": [],
+        "events": [],
+    }
+    trace_path.write_text(json.dumps(trace), encoding="utf-8")
+
+    report = run_trace_viewer(str(trace_path), detail=True, markdown=True)
+
+    assert report.startswith("# MiniCode Trace Report")
+    assert "id: run-1" not in report
+
+
 def test_run_trace_list_returns_numbered_paths(tmp_path):
     trace_dir = tmp_path / "traces"
     trace_dir.mkdir()
     trace_path = trace_dir / "trace.json"
-    trace_path.write_text("{}", encoding="utf-8")
+    trace_path.write_text('{"run":{"metadata":{}}}', encoding="utf-8")
 
     output = run_trace_list(str(trace_dir), limit=10)
 
@@ -121,6 +234,33 @@ def test_run_trace_list_returns_message_when_empty(tmp_path):
     output = run_trace_list(str(tmp_path / "missing"), limit=10)
 
     assert output == "No traces found."
+
+
+def test_run_trace_list_filters_by_metadata(tmp_path):
+    trace_dir = tmp_path / "traces"
+    trace_dir.mkdir()
+    agent_trace = trace_dir / "agent.json"
+    fixed_trace = trace_dir / "fixed.json"
+    agent_trace.write_text(
+        '{"run":{"metadata":{"mode":"agent","provider":"mimo","model":"mimo-v2.5-pro","task":"读取 README"}}}',
+        encoding="utf-8",
+    )
+    fixed_trace.write_text(
+        '{"run":{"metadata":{"mode":"fixed","task":"list files"}}}',
+        encoding="utf-8",
+    )
+
+    output = run_trace_list(
+        str(trace_dir),
+        limit=10,
+        mode="agent",
+        provider="mimo",
+        model="mimo-v2.5-pro",
+        task_contains="README",
+    )
+
+    assert str(agent_trace) in output
+    assert str(fixed_trace) not in output
 
 
 def test_run_trace_cleanup_returns_deleted_count(tmp_path):

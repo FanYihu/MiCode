@@ -1,5 +1,6 @@
 from minicode.agent import AgentAction, InvalidActionText, LLMError, MiniCodeAgent
 from minicode.models import EventType, RunStatus, StepType
+from minicode.tool_registry import ToolDefinition, ToolRegistry, ToolResult
 from minicode.workspace import Workspace
 
 
@@ -97,6 +98,61 @@ def test_agent_denies_dangerous_shell_command(tmp_path):
     assert trace["run"]["status"] == RunStatus.FAILED.value
     assert trace["steps"][0]["metadata"]["tool"] == "run_shell"
     assert "权限不足" in trace["events"][-1]["content"]
+    assert trace["events"][-1]["type"] == EventType.ERROR.value
+    assert trace["events"][-1]["metadata"]["tool"] == "run_shell"
+    assert trace["events"][-1]["metadata"]["args"] == {"command": "rm -rf /"}
+    assert trace["events"][-1]["metadata"]["ok"] is False
+    assert trace["events"][-1]["metadata"]["error"]
+    assert trace["events"][-1]["metadata"]["details"]["decision"]
+    assert "review_message" in trace["events"][-1]["metadata"]["details"]
+
+
+def test_agent_routes_tool_actions_through_tool_registry(tmp_path):
+    registry = ToolRegistry()
+    registry.register(
+        ToolDefinition(
+            name="echo",
+            description="Echo text for agent observation.",
+            handler=lambda args: ToolResult(
+                ok=True,
+                output=f"echo: {args['text']}",
+                metadata={"custom": "yes"},
+            ),
+        )
+    )
+    agent = MiniCodeAgent(
+        Workspace(str(tmp_path)),
+        SequenceLLM(
+            [
+                AgentAction(tool="echo", args={"text": "hello"}),
+                AgentAction(tool="", args={"answer": "完成"}, final=True),
+            ]
+        ),
+        tool_registry=registry,
+    )
+
+    trace = agent.run("echo test")
+
+    assert trace["run"]["status"] == RunStatus.COMPLETED.value
+    assert trace["events"][0]["type"] == EventType.TOOL_CALL.value
+    assert trace["events"][0]["content"] == "echo: hello"
+    assert trace["events"][0]["metadata"]["tool"] == "echo"
+    assert trace["events"][0]["metadata"]["args"] == {"text": "hello"}
+    assert trace["events"][0]["metadata"]["details"]["custom"] == "yes"
+
+
+def test_agent_records_unknown_registry_tool_as_tool_error(tmp_path):
+    agent = MiniCodeAgent(
+        Workspace(str(tmp_path)),
+        SequenceLLM([AgentAction(tool="missing", args={})]),
+    )
+
+    trace = agent.run("missing tool")
+
+    assert trace["run"]["status"] == RunStatus.FAILED.value
+    assert trace["events"][0]["type"] == EventType.ERROR.value
+    assert trace["events"][0]["metadata"]["tool"] == "missing"
+    assert trace["events"][0]["metadata"]["error"] == "unknown_tool"
 
 
 def test_agent_fails_when_max_steps_exceeded(tmp_path):
