@@ -280,6 +280,10 @@ micode/pipeline_engine.py
 - Permission Rule 分层已完成，当前按 `deny -> allow -> review` 执行，并把命中的 rule/layer 写入 trace metadata。
 - Tool Failure Handling 已统一失败分类、可恢复标记和 retry_hint。
 - Tool Self-Check 已接入 before/after Hook，检查参数契约和关键结果 metadata。
+- ToolResult provenance 已统一记录可信级别、来源、SHA-256 和注入风险。
+- SecurityState 会在中高风险不可信输出后污染当前上下文，并把后续副作用工具升级为 Human Review。
+- Human Review 已支持持久化、批准、拒绝、取消、单次消费恢复和 `WAITING_HUMAN` 状态。
+- Security Review 已提供独立 Trace 审计入口。
 
 参考：
 
@@ -299,6 +303,7 @@ MCP 放在 Tool Registry、Permission、Context 基础稳定之后接入。
 - MCP tool discovery。
 - MCP tool call。
 - MCP permission 和 trace。
+- 当前已完成 config.toml server 配置、newline/Content-Length stdio JSON-RPC、初始化、分页 discovery、tool/resource/prompt 调用、超时、重连、payload 上限、权限审核和生命周期关闭。
 
 参考：
 

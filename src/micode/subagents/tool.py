@@ -5,7 +5,7 @@ from micode.subagents.models import (
     SubAgentResult,
     SubAgentTask,
 )
-from micode.tools.registry import ToolDefinition, ToolResult
+from micode.tools.registry import ToolCapabilities, ToolDefinition, ToolResult
 from typing import Callable, Optional
 
 
@@ -49,6 +49,14 @@ def create_subagent_tool(
         },
         # SubAgent 可能调用写工具，默认必须串行执行。
         parallel_safe=False,
+        capabilities=ToolCapabilities(
+            writes_workspace=True,
+            runs_commands=True,
+            external_io=True,
+        ),
+        # 主 Agent 只接收经过 validate_subagent_result 校验的结构化摘要；原始证据留在 metadata。
+        output_trust="trusted",
+        source="subagent",
         handler=lambda args: run_subagent_tool(
             executor,
             actual_policy,

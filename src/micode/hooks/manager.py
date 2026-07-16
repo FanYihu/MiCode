@@ -34,6 +34,9 @@ class HookManager:
     def __init__(self) -> None:
         self._hooks = {event: [] for event in HookEvent}
         self._lock = threading.RLock()
+        # 默认装配器会把共享安全状态和审核存储挂在 Manager 上，Registry 可据此恢复。
+        self.security_state = None
+        self.human_review_store = None
 
     def register(
         self,

@@ -9,3 +9,15 @@ native_tools = true
 parallel_tool_calls = false
 reasoning_content = false
 strict_tool_schema = false
+
+[mcp]
+enabled = false
+
+# 启用时删除下面各行开头的 `# `，并把命令改成实际 MCP Server。
+# [mcp.servers.example]
+# command = "python3"
+# args = ["path/to/server.py"]
+# protocol = "newline-json"
+# request_timeout_seconds = 10
+# startup_timeout_seconds = 3
+# max_payload_bytes = 4194304

@@ -1,8 +1,10 @@
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from typing import Callable, Optional
 
 from micode.hooks.manager import HookManager
 from micode.hooks.models import HookContext, HookEvent
+from micode.human_review import HumanReviewError
+from micode.security import TrustLevel, annotate_tool_result
 
 
 RESULT_SUMMARY_LIMIT = 200
@@ -19,6 +21,34 @@ class ToolResult:
     ok: bool
     output: str
     metadata: dict = field(default_factory=dict)
+    trust_level: str = ""
+    source: str = ""
+    content_sha256: str = ""
+    injection_risk: dict = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class ToolCapabilities:
+    """工具的统一能力声明，供并行、权限、审核和 UI 共同消费。"""
+
+    read_only: bool = False
+    writes_workspace: bool = False
+    runs_commands: bool = False
+    external_io: bool = False
+    requires_review: bool = False
+    reversible: bool = False
+
+    @property
+    def has_side_effects(self) -> bool:
+        return bool(
+            self.writes_workspace
+            or self.runs_commands
+            or self.requires_review
+            or (self.external_io and not self.read_only)
+        )
+
+    def to_dict(self) -> dict:
+        return asdict(self)
 
 
 @dataclass
@@ -38,6 +68,9 @@ class ToolDefinition:
     )
     # 只有无副作用、彼此独立的工具才能进入并行执行组。
     parallel_safe: bool = False
+    capabilities: ToolCapabilities = field(default_factory=ToolCapabilities)
+    output_trust: str = TrustLevel.TRUSTED.value
+    source: str = "runtime"
 
 
 @dataclass
@@ -55,6 +88,8 @@ class ToolRegistry:
     def __init__(self, hook_manager: Optional[HookManager] = None) -> None:
         self._tools: dict[str, ToolDefinition] = {}
         self.hook_manager = hook_manager or HookManager()
+        self._disposers = []
+        self._closed = False
 
     def register(self, tool: ToolDefinition) -> None:
         """注册工具；同名工具不允许覆盖，避免隐藏错误。"""
@@ -92,27 +127,48 @@ class ToolRegistry:
             for tool in self._tools.values()
         ]
 
+    def capability_inventory(self) -> list[dict]:
+        """返回 UI、readiness 和权限审核可复用的能力清单。"""
+        return [
+            {
+                "name": tool.name,
+                "parallel_safe": tool.parallel_safe,
+                "capabilities": tool.capabilities.to_dict(),
+                "output_trust": tool.output_trust,
+                "source": tool.source,
+            }
+            for tool in self._tools.values()
+        ]
+
     def is_parallel_safe(self, name: str) -> bool:
         """返回工具是否允许和同批其他只读工具并行执行。"""
         tool = self._tools.get(name)
         return bool(tool and tool.parallel_safe)
 
-    def call(self, name: str, args: dict) -> ToolResult:
+    def call(
+        self,
+        name: str,
+        args: dict,
+        *,
+        review_id: str = "",
+        run_id: str = "",
+        session_id: str = "",
+    ) -> ToolResult:
         """调用工具；未知工具用失败结果表达，方便 Agent 后续记录进 trace。"""
         tool = self._tools.get(name)
         if tool is None:
-            return ToolResult(
-                ok=False,
-                output=f"Unknown tool: {name}",
-                metadata=_build_tool_metadata(
-                    tool_name=name,
-                    args=args,
+            return _normalize_result(
+                name,
+                args,
+                ToolResult(
                     ok=False,
                     output=f"Unknown tool: {name}",
                     metadata={
                         "error": "unknown_tool",
                         "available_tools": self.list_names(),
                     },
+                    trust_level=TrustLevel.TRUSTED.value,
+                    source="registry",
                 ),
             )
 
@@ -122,6 +178,11 @@ class ToolRegistry:
                 tool_name=name,
                 args=dict(args),
                 tool=tool,
+                metadata={
+                    "review_id": review_id,
+                    "run_id": run_id,
+                    "session_id": session_id,
+                },
             )
         )
         actual_args = before.context.args
@@ -137,6 +198,7 @@ class ToolRegistry:
                         "hooks": before.executions,
                     },
                 ),
+                tool,
             )
 
         try:
@@ -173,7 +235,14 @@ class ToolRegistry:
                         "hooks": before.executions + error_dispatch.executions,
                     },
                 ),
+                tool,
             )
+
+        annotate_tool_result(
+            result,
+            default_trust_level=tool.output_trust,
+            default_source=tool.source,
+        )
 
         after = self.hook_manager.emit(
             HookContext(
@@ -192,17 +261,85 @@ class ToolRegistry:
         }
         if hook_executions:
             result.metadata["hooks"] = hook_executions
-        return _normalize_result(name, actual_args, result)
+        return _normalize_result(name, actual_args, result, tool)
+
+    def resume(self, review_id: str) -> ToolResult:
+        """在人工批准后恢复原工具调用，批准只能消费一次。"""
+        store = getattr(self.hook_manager, "human_review_store", None)
+        if store is None:
+            return ToolResult(
+                ok=False,
+                output="Human review store is not configured",
+                metadata={"error": "human_review_not_configured"},
+            )
+        try:
+            request = store.get(review_id)
+        except HumanReviewError as error:
+            return ToolResult(
+                ok=False,
+                output=str(error),
+                metadata={"error": "human_review_invalid"},
+            )
+        return self.call(
+            request.tool_name,
+            request.args,
+            review_id=review_id,
+            run_id=request.run_id,
+            session_id=request.session_id,
+        )
+
+    def register_disposer(self, disposer: Callable[[], None]) -> None:
+        """登记外部进程、线程池或后台任务的关闭函数。"""
+        if self._closed:
+            disposer()
+            return
+        self._disposers.append(disposer)
+
+    def close(self) -> None:
+        """按注册逆序可靠关闭资源；重复调用不会再次执行。"""
+        if self._closed:
+            return
+        self._closed = True
+        errors = []
+        for disposer in reversed(self._disposers):
+            try:
+                disposer()
+            except Exception as error:  # pragma: no cover - 防御性关闭路径
+                errors.append(f"{type(error).__name__}: {error}")
+        self._disposers = []
+        if errors:
+            raise RuntimeError("tool registry close failed: " + "; ".join(errors))
+
+    def __enter__(self) -> "ToolRegistry":
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback) -> None:
+        self.close()
 
 
-def _normalize_result(name: str, args: dict, result: ToolResult) -> ToolResult:
+def _normalize_result(
+    name: str,
+    args: dict,
+    result: ToolResult,
+    tool: Optional[ToolDefinition] = None,
+) -> ToolResult:
     """给 ToolResult 补齐统一 metadata 契约。"""
+    annotate_tool_result(
+        result,
+        default_trust_level=(tool.output_trust if tool else TrustLevel.TRUSTED.value),
+        default_source=(tool.source if tool else "runtime"),
+    )
     result.metadata = _build_tool_metadata(
         tool_name=name,
         args=args,
         ok=result.ok,
         output=result.output,
         metadata=result.metadata,
+        trust_level=result.trust_level,
+        source=result.source,
+        content_sha256=result.content_sha256,
+        injection_risk=result.injection_risk,
+        capabilities=(tool.capabilities.to_dict() if tool else ToolCapabilities().to_dict()),
     )
     return result
 
@@ -213,6 +350,11 @@ def _build_tool_metadata(
     ok: bool,
     output: str,
     metadata: dict,
+    trust_level: str,
+    source: str,
+    content_sha256: str,
+    injection_risk: dict,
+    capabilities: dict,
 ) -> dict:
     """生成统一工具 trace metadata；工具特有信息统一收进 details。"""
     error = "" if ok else str(metadata.get("error") or output)
@@ -234,6 +376,11 @@ def _build_tool_metadata(
         "ok": ok,
         "result_summary": _summarize_tool_output(output),
         "error": error,
+        "trust_level": trust_level,
+        "source": source,
+        "content_sha256": content_sha256,
+        "injection_risk": dict(injection_risk),
+        "capabilities": dict(capabilities),
         "details": details,
     }
     return normalized
@@ -253,6 +400,12 @@ def _classify_failure(error: str, output: str, metadata: dict) -> ToolFailure:
             "unknown_tool",
             True,
             "Choose one of the available tools from details.available_tools.",
+        )
+    if error == "human_review_required":
+        return ToolFailure(
+            "human_review_required",
+            True,
+            "Approve the review request, then resume it by review_id.",
         )
     if error in {"permission_denied", "subagent_write_not_approved"}:
         return ToolFailure(
@@ -299,6 +452,31 @@ def _classify_failure(error: str, output: str, metadata: dict) -> ToolFailure:
 
 def _classify_exception(error: Exception) -> ToolFailure:
     """根据 Python 异常类型给工具异常一个可恢复提示。"""
+    exception_name = type(error).__name__
+    if exception_name == "MCPTimeoutError":
+        return ToolFailure(
+            "mcp_timeout",
+            True,
+            "Retry a read-only call or inspect MCP server health before retrying a write.",
+        )
+    if exception_name == "MCPProcessExited":
+        return ToolFailure(
+            "mcp_process_exited",
+            True,
+            "The client will reconnect on the next call; retry only if the call is idempotent.",
+        )
+    if exception_name == "MCPPayloadTooLarge":
+        return ToolFailure(
+            "mcp_payload_too_large",
+            False,
+            "Reduce the response at the MCP server or raise the audited payload limit.",
+        )
+    if exception_name in {"MCPProtocolError", "MCPError"}:
+        return ToolFailure(
+            "mcp_protocol_error",
+            True,
+            "Inspect MCP configuration and server stderr before retrying.",
+        )
     if isinstance(error, KeyError):
         return ToolFailure(
             "invalid_args",

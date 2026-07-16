@@ -70,3 +70,17 @@ def test_cancel_created_run():
     run.cancel()
 
     assert run.status == models.RunStatus.CANCELLED
+
+
+def test_run_can_wait_pause_and_resume():
+    run = models.Run()
+    run.start()
+
+    run.wait_for_tool()
+    assert run.status == models.RunStatus.WAITING_TOOL
+    run.wait_for_human()
+    assert run.status == models.RunStatus.WAITING_HUMAN
+    run.pause()
+    assert run.status == models.RunStatus.PAUSED
+    run.resume()
+    assert run.status == models.RunStatus.RUNNING

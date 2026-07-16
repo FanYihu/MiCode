@@ -23,6 +23,8 @@ Micode 目前已经从最小 Agent Loop，推进到可扩展的 Coding Agent Run
 - Skill 系统：项目级 / 用户级 Skill 加载、路由、按需加载和候选沉淀。
 - 长短期 Memory：Session、Working Memory、Summary、Episodic / Semantic / Procedural Memory、Memory Graph、Temporal Facts、Hybrid Retrieval、Ranking Injection、Review。
 - Context 系统：Context Layer、Tool Result Summary、Artifact Placeholder、Artifact Read Tool、Prompt Cache、Decision Freeze。
+- 安全系统：Tool provenance、untrusted 边界、Prompt Injection 扫描、污染后写操作升级、可恢复 Human Review 和 Security Trace Audit。
+- MCP：同一 `config.toml` 配置 stdio server，支持 tool/resource/prompt、权限、超时、重连、payload 限制与生命周期关闭。
 
 ## Skill 系统
 

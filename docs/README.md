@@ -13,6 +13,7 @@
 - `stage1/`：Stage 1 架构、已完成能力和遗留问题。
 - `stage2/`：Stage 2 边界、参考项目映射、路线和开发规则。
 - `migration.md`：旧 `.minicode` 状态到 `.micode` 的显式幂等迁移。
+- `reference_parity.md`：固定参考基线与 Micode 能力、测试和状态台账。
 
 ## 学习笔记
 

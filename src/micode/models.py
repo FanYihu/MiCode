@@ -8,6 +8,9 @@ class RunStatus(str, Enum):
     """Run 的状态枚举"""
     CREATED = "created"
     RUNNING = "running"
+    WAITING_TOOL = "waiting_tool"
+    WAITING_HUMAN = "waiting_human"
+    PAUSED = "paused"
     COMPLETED = "completed"
     FAILED = "failed"
     CANCELLED = "cancelled"
@@ -64,8 +67,49 @@ class Run:
         self.completed_at = now
         self.updated_at = now
 
-    def fail(self) -> None:
+    def wait_for_tool(self) -> None:
+        """模型已决策，运行暂时等待工具结果。"""
         if self.status != RunStatus.RUNNING:
+            raise InvalidRunStatusTransition("状态流转非法")
+        self.status = RunStatus.WAITING_TOOL
+        self.updated_at = datetime.now(timezone.utc)
+
+    def wait_for_human(self) -> None:
+        """权限或安全策略要求人工决定后才能恢复。"""
+        if self.status not in (RunStatus.RUNNING, RunStatus.WAITING_TOOL):
+            raise InvalidRunStatusTransition("状态流转非法")
+        self.status = RunStatus.WAITING_HUMAN
+        self.updated_at = datetime.now(timezone.utc)
+
+    def pause(self) -> None:
+        """显式暂停仍可恢复的运行。"""
+        if self.status not in (
+            RunStatus.RUNNING,
+            RunStatus.WAITING_TOOL,
+            RunStatus.WAITING_HUMAN,
+        ):
+            raise InvalidRunStatusTransition("状态流转非法")
+        self.status = RunStatus.PAUSED
+        self.updated_at = datetime.now(timezone.utc)
+
+    def resume(self) -> None:
+        """从等待或暂停状态回到运行态。"""
+        if self.status not in (
+            RunStatus.WAITING_TOOL,
+            RunStatus.WAITING_HUMAN,
+            RunStatus.PAUSED,
+        ):
+            raise InvalidRunStatusTransition("状态流转非法")
+        self.status = RunStatus.RUNNING
+        self.updated_at = datetime.now(timezone.utc)
+
+    def fail(self) -> None:
+        if self.status not in (
+            RunStatus.RUNNING,
+            RunStatus.WAITING_TOOL,
+            RunStatus.WAITING_HUMAN,
+            RunStatus.PAUSED,
+        ):
             raise InvalidRunStatusTransition("状态流转非法")
 
         now = datetime.now(timezone.utc)
@@ -74,7 +118,13 @@ class Run:
         self.updated_at = now
 
     def cancel(self) -> None:
-        if self.status not in (RunStatus.RUNNING, RunStatus.CREATED):
+        if self.status not in (
+            RunStatus.RUNNING,
+            RunStatus.CREATED,
+            RunStatus.WAITING_TOOL,
+            RunStatus.WAITING_HUMAN,
+            RunStatus.PAUSED,
+        ):
             raise InvalidRunStatusTransition("状态流转非法")
 
         now = datetime.now(timezone.utc)

@@ -5,7 +5,8 @@ from typing import Optional
 
 from micode.context.artifacts import safe_artifact_filename
 from micode.context.tool_results import summarize_head_tail
-from micode.tools.registry import ToolDefinition, ToolResult
+from micode.security import TrustLevel
+from micode.tools.registry import ToolCapabilities, ToolDefinition, ToolResult
 
 
 DEFAULT_ARTIFACT_READ_CHARS = 4000
@@ -17,6 +18,9 @@ def create_read_artifact_tool(artifact_dir: str) -> ToolDefinition:
         name="read_artifact",
         description="Read a saved artifact by id or path with workspace-safe bounds.",
         parallel_safe=True,
+        capabilities=ToolCapabilities(read_only=True),
+        output_trust=TrustLevel.LOCAL.value,
+        source="artifact-store",
         parameters={
             "type": "object",
             "properties": {

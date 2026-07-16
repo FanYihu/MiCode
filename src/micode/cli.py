@@ -35,6 +35,14 @@ from micode.memory.skill_candidate import (
     skill_candidates_from_procedures,
 )
 from micode.memory.temporal import temporal_status_counts
+from micode.mcp.config import load_mcp_server_configs
+from micode.mcp.integration import MCPManager
+from micode.human_review import (
+    APPROVED,
+    CANCELLED,
+    REJECTED,
+    HumanReviewStore,
+)
 from micode.persistence import (
     cleanup_traces,
     filter_traces,
@@ -48,6 +56,7 @@ from micode.persistence import (
 )
 from micode.memory.session import SessionMessageStore, SessionStore, messages_from_trace
 from micode.skills import LLMSkillRouter, discover_project_skills, discover_user_skills
+from micode.security_review import review_security_trace_file
 from micode.state_migration import migrate_state
 from micode.subagents import create_default_subagent_executor
 from micode.tools.default import create_default_tool_registry
@@ -235,11 +244,15 @@ def run_agent_task(
         artifact_threshold_chars=artifact_threshold_chars,
         prompt_cache_key=prompt_cache_entry.key,
         subagent_executor=create_default_subagent_executor(workspace),
+        mcp_server_configs=load_mcp_server_configs(config_path),
     )
     if session_context and hasattr(llm, "set_session_context"):
         llm.set_session_context(session_context)
 
-    trace = agent.run(task)
+    try:
+        trace = agent.run(task)
+    finally:
+        agent.close()
     trace["run"]["metadata"]["context_assembly"] = context_assembly.to_dict()
     trace["run"]["metadata"]["context_token_estimate"] = context_token_estimate
     trace["run"]["metadata"]["prompt_cache"] = prompt_cache_entry.to_metadata()
@@ -474,6 +487,60 @@ def run_context_review(trace_path: str) -> dict:
     return review_context_trace_file(trace_path).to_dict()
 
 
+def run_human_review(
+    action: str,
+    review_dir: str = ".micode/human-reviews",
+    review_id: str = "",
+    note: str = "",
+    workspace_path: str = ".",
+) -> dict:
+    """管理持久化审核请求，并可在批准后恢复原工具调用。"""
+    store = HumanReviewStore(review_dir)
+    if action == "list":
+        return {
+            "action": action,
+            "requests": [request.to_dict() for request in store.list()],
+        }
+    if not review_id:
+        raise ValueError("review_id is required for this action")
+    if action == "show":
+        return {"action": action, "request": store.get(review_id).to_dict()}
+    if action in {"approve", "reject", "cancel"}:
+        status = {
+            "approve": APPROVED,
+            "reject": REJECTED,
+            "cancel": CANCELLED,
+        }[action]
+        request = store.decide(review_id, status, note=note)
+        return {"action": action, "request": request.to_dict()}
+    if action == "resume":
+        registry = create_default_tool_registry(
+            Workspace(workspace_path),
+            human_review_store=store,
+        )
+        try:
+            result = registry.resume(review_id)
+        finally:
+            registry.close()
+        return {
+            "action": action,
+            "ok": result.ok,
+            "output": result.output,
+            "metadata": result.metadata,
+        }
+    raise ValueError(f"unknown human review action: {action}")
+
+
+def run_mcp_inspect(config_path: str, workspace_path: str = ".") -> dict:
+    """连接 config.toml 中启用的 MCP Server，并返回发现结果。"""
+    configs = load_mcp_server_configs(config_path)
+    manager = MCPManager(configs, str(Workspace(workspace_path).root))
+    try:
+        return manager.inspect()
+    finally:
+        manager.close()
+
+
 def run_skill_candidate_review(
     action: str = "list",
     candidate_dir: str = ".micode/skill-candidates",
@@ -621,6 +688,23 @@ def main() -> None:
     migrate_parser.add_argument("--source", default=".minicode")
     migrate_parser.add_argument("--target", default=".micode")
 
+    security_review_parser = subparsers.add_parser("security-review")
+    security_review_parser.add_argument("path")
+
+    human_review_parser = subparsers.add_parser("human-review")
+    human_review_parser.add_argument(
+        "action",
+        choices=["list", "show", "approve", "reject", "cancel", "resume"],
+    )
+    human_review_parser.add_argument("--review-dir", default=".micode/human-reviews")
+    human_review_parser.add_argument("--review-id", default="")
+    human_review_parser.add_argument("--note", default="")
+    human_review_parser.add_argument("--workspace", default=".")
+
+    mcp_inspect_parser = subparsers.add_parser("mcp-inspect")
+    mcp_inspect_parser.add_argument("--config", default="config.toml")
+    mcp_inspect_parser.add_argument("--workspace", default=".")
+
     args = parser.parse_args()
 
     if args.command == "fixed":
@@ -698,6 +782,21 @@ def main() -> None:
         print(json.dumps(report, ensure_ascii=False, indent=2))
         if not report["ok"]:
             raise SystemExit(1)
+    elif args.command == "security-review":
+        report = review_security_trace_file(args.path)
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+    elif args.command == "human-review":
+        report = run_human_review(
+            args.action,
+            review_dir=args.review_dir,
+            review_id=args.review_id,
+            note=args.note,
+            workspace_path=args.workspace,
+        )
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+    elif args.command == "mcp-inspect":
+        report = run_mcp_inspect(args.config, args.workspace)
+        print(json.dumps(report, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":

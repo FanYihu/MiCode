@@ -228,8 +228,8 @@ def test_default_hook_manager_does_not_register_permission_twice(tmp_path):
     create_default_tool_registry(Workspace(str(tmp_path)), hook_manager=manager)
     create_default_tool_registry(Workspace(str(tmp_path)), hook_manager=manager)
 
-    # 默认 Hook 包含 permission、subagent_approval 和 before/after 自检。
-    assert manager.stats()["registered"] == 4
+    # 默认 Hook 包含 permission、subagent_approval、before/after 自检和安全边界。
+    assert manager.stats()["registered"] == 5
 
 
 def test_named_hook_cannot_impersonate_permission_hook(tmp_path):
@@ -247,7 +247,7 @@ def test_named_hook_cannot_impersonate_permission_hook(tmp_path):
     result = registry.call("run_shell", {"command": "rm -rf /"})
 
     assert result.ok is False
-    assert manager.stats()["registered"] == 5
+    assert manager.stats()["registered"] == 6
     assert result.metadata["details"]["hooks"][0]["hook"] == "permission"
 
 

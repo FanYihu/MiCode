@@ -259,3 +259,5 @@
 - 2026-06-09：完成原生 tool_calls 批量执行策略，新增 AgentTurn 和 ToolDefinition.parallel_safe；连续只读工具并行执行，有副作用工具按原顺序串行执行，Trace 记录批次信息，结果按 tool_call_id 顺序回传模型。
 - 2026-06-09：补充 Python 多线程与 ThreadPoolExecutor 学习笔记，梳理线程、GIL、submit、Future、result、上下文管理器及其在 Micode 并行工具执行中的代码映射。
 - 2026-07-16：完成项目首个 Micode 改名里程碑，统一品牌、`micode` 包、`MicodeAgent`、`.micode` 状态目录与 `micode` CLI；移除受版本控制的 egg-info 和本地 `config.toml`，新增无密钥配置模板、标准构建配置及带 SHA-256 校验的幂等状态迁移命令，确认 386 项测试和 Python 3.9 安装冒烟通过。
+- 2026-07-16：完成 Day 73-Day 77 安全主线，新增 Tool provenance、untrusted observation、可解释 Prompt Injection 扫描、污染上下文写操作升级、可持久化 Human Review、WAITING_TOOL/WAITING_HUMAN/PAUSED 状态和 security-review。
+- 2026-07-16：完成 Day 78-Day 84 MCP 主线，新增 config.toml server 配置、stdio newline/Content-Length JSON-RPC、初始化、tool/resource/prompt discovery 与调用、超时、进程退出、重连、payload 限制、写工具审批、Mock MCP Server 和 Registry disposer 生命周期。
