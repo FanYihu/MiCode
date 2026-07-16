@@ -1,4 +1,4 @@
-from minicode.context.layers import (
+from micode.context.layers import (
     ContextLayer,
     ContextLayerAssembler,
     TRUNCATION_MARKER,

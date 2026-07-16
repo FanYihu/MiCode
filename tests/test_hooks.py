@@ -1,7 +1,7 @@
-from minicode.hooks import HookContext, HookEvent, HookManager, HookResult
-from minicode.tools.default import create_default_tool_registry
-from minicode.tools.registry import ToolDefinition, ToolRegistry, ToolResult
-from minicode.workspace import Workspace
+from micode.hooks import HookContext, HookEvent, HookManager, HookResult
+from micode.tools.default import create_default_tool_registry
+from micode.tools.registry import ToolDefinition, ToolRegistry, ToolResult
+from micode.workspace import Workspace
 
 
 def test_before_hooks_run_by_priority_and_can_rewrite_args():
@@ -278,7 +278,7 @@ def test_tool_self_check_blocks_unexpected_argument(tmp_path):
 
 def test_tool_self_check_records_missing_result_metadata():
     manager = HookManager()
-    from minicode.hooks.tool_self_check import ToolSelfCheckHook
+    from micode.hooks.tool_self_check import ToolSelfCheckHook
 
     self_check = ToolSelfCheckHook()
     manager.register(HookEvent.BEFORE_TOOL_CALL, self_check, name="tool_self_check")

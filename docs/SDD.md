@@ -1,12 +1,12 @@
-# MiniCode SDD
+# Micode SDD
 
 ## 为什么做
 
-你已经学过 Python、FastAPI、OpenAI API、Agent Runtime、工具系统和 Guardrails。MiniCode 用来把这些知识合成一个真实的小型 coding agent，让你理解“会聊天”到“能执行工程任务”的差别。
+你已经学过 Python、FastAPI、OpenAI API、Agent Runtime、工具系统和 Guardrails。Micode 用来把这些知识合成一个真实的小型 coding agent，让你理解“会聊天”到“能执行工程任务”的差别。
 
 ## 做什么
 
-先实现一个 Python 版 MiniCode：
+先实现一个 Python 版 Micode：
 
 - 能接收一个代码任务
 - 能建立一次 Run
@@ -130,7 +130,7 @@
 
 ## 做了什么
 
-- 2026-05-28：创建 MiniCode 学习项目文档和第一天手写任务，明确从核心 Runtime 数据模型开始。
+- 2026-05-28：创建 Micode 学习项目文档和第一天手写任务，明确从核心 Runtime 数据模型开始。
 - 2026-05-29：进入 Day 02 Run 状态机学习，准备为 Run 增加受控状态流转和非法状态保护。
 - 2026-05-29：完成 Run 状态机实现，新增非法状态流转异常，并补充状态流转测试。
 - 2026-05-29：进入 Day 03 Trace 记录器学习，准备把 Run、Step、Event 组织成可复盘的执行轨迹。
@@ -146,7 +146,7 @@
 - 2026-05-29：进入 Day 08 CLI 最小闭环学习，准备把 Runtime、Trace、Workspace 和工具能力串成命令行入口。
 - 2026-05-30：完成 CLI 最小闭环，支持 list files 与 run tests，并能输出包含命令结果的 trace JSON。
 - 2026-05-30：进入 Day 09 Mock LLM Agent Loop 学习，准备用可测试的假模型驱动观察、行动和结束流程。
-- 2026-05-31：完成 MiniCodeAgent 基础 loop，支持 list_files、read_file、run_shell 和 final action 的 trace 闭环。
+- 2026-05-31：完成 MicodeAgent 基础 loop，支持 list_files、read_file、run_shell 和 final action 的 trace 闭环。
 - 2026-05-31：进入 Day 10 综合测试与复盘，准备梳理第一阶段架构、补齐评估用例并沉淀学习总结。
 - 2026-05-31：补充 Agent 综合测试，覆盖读取文件后结束、危险命令拒绝和最大步数失败。
 - 2026-05-30：完成 CLI 最小闭环，支持 list files、run tests 和不支持任务的 trace 输出。
@@ -186,8 +186,8 @@
 - 2026-06-02：完成 Day 28 Trace Markdown Report，新增 format_trace_markdown 和 CLI trace --markdown，确认 93 个测试通过。
 - 2026-06-02：进入 Day 29 Trace Export File 学习，准备把 Markdown trace 报告保存成文件。
 - 2026-06-02：完成 Day 29 Trace Export File，新增 write_text_report 和 CLI trace --markdown --output，确认 95 个测试通过。
-- 2026-06-02：进入 Day 30 Project Capability Review 学习，准备系统盘点 MiniCode 已完成能力和后续缺口。
-- 2026-06-02：完成 Day 30 Project Capability Review，整理 Stage 1/Stage 2 文档边界，明确 MiniCode 已完成能力、遗留问题和下一阶段优先级。
+- 2026-06-02：进入 Day 30 Project Capability Review 学习，准备系统盘点 Micode 已完成能力和后续缺口。
+- 2026-06-02：完成 Day 30 Project Capability Review，整理 Stage 1/Stage 2 文档边界，明确 Micode 已完成能力、遗留问题和下一阶段优先级。
 - 2026-06-02：进入 Day 31 Structured File Edit Tool 学习，准备实现更安全的结构化文件编辑能力。
 - 2026-06-02：完成 Stage 2 平滑过渡计划落地，克隆参考项目到 references/MiniCode-Python，并新增 Stage 2 复盘、参考映射、学习路线和开发规则文档。
 - 2026-06-02：完成 Day 31 Structured File Edit Tool，新增 replace_text 的插入、删除、单次替换、失败异常和路径边界测试，确认 101 个测试通过。
@@ -201,7 +201,7 @@
 - 2026-06-03：完成 Day 35 Stage 2 Bridge Review，更新 Stage 1/Stage 2 文档边界并确认工具 Runtime 过渡完成，确认 119 个测试通过。
 - 2026-06-03：进入 Day 36 Skill 数据结构学习，准备定义 Skill 的最小数据模型和 prompt 格式化能力。
 - 2026-06-03：完成 Day 36 Skill 数据结构，新增 Skill 数据模型和 format_skill_for_prompt，确认 123 个测试通过。
-- 2026-06-03：进入 Day 37 Skill Loader 学习，准备从项目 .minicode/skills 目录加载 SKILL.md。
+- 2026-06-03：进入 Day 37 Skill Loader 学习，准备从项目 .micode/skills 目录加载 SKILL.md。
 - 2026-06-04：完成 Day 37 Skill Loader，新增 SKILL.md description 提取、单文件加载和项目级 discover_project_skills，确认 128 个测试通过。
 - 2026-06-04：调整 Skill 主线规划，将 Day 38-Day 41 改为 Summary Injection、Skill Router、Load Skill Tool、Skill Review，避免过早进入 RAG 式粗召回/精排。
 - 2026-06-04：进入 Day 38 Skill Summary Injection 学习，准备在小规模 Skill 场景下注入全部 Skill Summary。
@@ -223,17 +223,17 @@
 - 2026-06-08：完成 Day 44 Event Log / Message History，新增 SessionMessage 和 SessionMessageStore，把 trace 中的用户任务、工具结果、错误和最终文本沉淀为会话级消息流。
 - 2026-06-08：完成 Day 45 Working Memory，新增 WorkingMemory 和 WorkingMemoryStore，基于 SessionMessage 维护当前目标、完成项、待办、约束和最近消息。
 - 2026-06-08：完成 Day 46 Context Compression / Session Summary，新增 SessionSummary、ContextCompressor 和紧凑上下文注入，较早消息压缩、最近消息保留原文，并在下一次 Agent run 前恢复会话上下文。
-- 2026-06-08：重构 Memory 模块目录，Session、Message History、Working Memory、Context Summary 和 Episodic Memory 统一收进 `minicode/memory/` 包；Session Summary 升级为 LLM 优先的结构化摘要，并保留确定性兜底。
-- 2026-06-08：完成 Day 47 Episodic Memory，新增 memory/episodic.py，从 trace 提炼具体经历并写入 .minicode/memory/episodes.json，为后续语义记忆、程序记忆和图谱抽取提供来源。
-- 2026-06-08：完成 Day 48 Semantic Memory，新增 memory/semantic.py，从 episode 提炼稳定事实并写入 .minicode/memory/semantic.json，支持 LLM 抽取、确定性兜底、事实 upsert 和轻量搜索。
-- 2026-06-08：完成 Day 49 Procedural Memory，新增 memory/procedural.py，从成功 episode 提炼可复用流程并写入 .minicode/memory/procedures.json，支持 LLM 抽取、确定性兜底、procedure upsert 和 Skill 候选转换。
-- 2026-06-08：完成 Day 50 Memory Graph 数据结构，新增 memory/graph.py，把 Session、Run、Episode、Semantic Memory 和 Procedural Memory 连成可持久化来源图，并在 CLI session 模式下自动更新 .minicode/memory/graph.json。
+- 2026-06-08：重构 Memory 模块目录，Session、Message History、Working Memory、Context Summary 和 Episodic Memory 统一收进 `micode/memory/` 包；Session Summary 升级为 LLM 优先的结构化摘要，并保留确定性兜底。
+- 2026-06-08：完成 Day 47 Episodic Memory，新增 memory/episodic.py，从 trace 提炼具体经历并写入 .micode/memory/episodes.json，为后续语义记忆、程序记忆和图谱抽取提供来源。
+- 2026-06-08：完成 Day 48 Semantic Memory，新增 memory/semantic.py，从 episode 提炼稳定事实并写入 .micode/memory/semantic.json，支持 LLM 抽取、确定性兜底、事实 upsert 和轻量搜索。
+- 2026-06-08：完成 Day 49 Procedural Memory，新增 memory/procedural.py，从成功 episode 提炼可复用流程并写入 .micode/memory/procedures.json，支持 LLM 抽取、确定性兜底、procedure upsert 和 Skill 候选转换。
+- 2026-06-08：完成 Day 50 Memory Graph 数据结构，新增 memory/graph.py，把 Session、Run、Episode、Semantic Memory 和 Procedural Memory 连成可持久化来源图，并在 CLI session 模式下自动更新 .micode/memory/graph.json。
 - 2026-06-08：完成 Day 51 Entity / Relation Extraction，新增 memory/entity.py，支持 LLM 优先、Semantic 三元组兜底的实体关系抽取，并把规范实体、语义关系和来源边写入 Memory Graph。
 - 2026-06-09：完成 Day 52 Temporal Facts / Conflict Resolution，新增 memory/temporal.py，为知识关系增加观测时间、有效时间、基数和状态，并在完整 Memory Graph 上解析跨 run 的替代、共存与冲突。
 - 2026-06-09：完成 Day 53 Hybrid Retrieval，新增 memory/retrieval.py，组合关键词、可选 embedding 和图遍历召回长期记忆，默认过滤 superseded 事实，并在 Agent run 前把相关记忆注入 prompt。
 - 2026-06-09：完成 Day 54 Memory Ranking / Injection Policy，新增 memory/ranking.py，按相关性、类型、置信度、时效性、Session 和冲突状态精排长期记忆，并用可审计字符预算控制最终 Prompt 注入。
 - 2026-06-10：完成 Day 55 Memory Review，新增 memory/review.py 和 memory-review CLI，对 Session、长期记忆、Memory Graph、Temporal Facts 与 Retrieval Injection 做只读体检，输出可审计结构化报告。
-- 2026-06-12：完成 Day 56 Context Layer 设计，新增 minicode/context/layers.py，把 Session Context 与 Long-term Memory 统一为可排序、可截断、可审计的上下文层，并在 CLI Agent 模式记录 context_assembly。
+- 2026-06-12：完成 Day 56 Context Layer 设计，新增 micode/context/layers.py，把 Session Context 与 Long-term Memory 统一为可排序、可截断、可审计的上下文层，并在 CLI Agent 模式记录 context_assembly。
 - 2026-06-12：完成 Day 57 Tool Result Summary，新增 context/tool_results.py，按工具类型压缩模型 observation 和原生 tool message，同时在 Trace 中保留完整输出及摘要审计字段。
 - 2026-06-16：完成 Day 58 Artifact Placeholder，新增 context/artifacts.py，超大工具结果外置保存到 artifact JSON，并在 Trace 与模型 observation 中保留摘要、占位符、路径和 sha256。
 - 2026-06-16：完成 Day 59 Runtime Stability，Artifact 写入改为内容 hash 幂等，新增 prompt_cache.py 生成本地 prompt cache 指纹，并在每轮模型决策前写入 Decision Freeze。
@@ -257,4 +257,5 @@
 - 2026-06-09：升级真实模型工具调用协议，为 ToolDefinition 增加 JSON Schema，由 ToolRegistry 生成 OpenAI-compatible tools 字段，并把原生 message.tool_calls 解析成 AgentAction；旧正文 JSON action 保留为测试和兼容 fallback。
 - 2026-06-09：完成 OpenAI-compatible Provider 抽象，新增 ProviderCapabilities、ModelTurn 和 ModelToolCall；TextLLM 保存标准 assistant/tool 消息，Agent 将工具结果通过 tool_call_id 回传模型，并支持 reasoning_content、strict schema 和 native tools fallback 配置。
 - 2026-06-09：完成原生 tool_calls 批量执行策略，新增 AgentTurn 和 ToolDefinition.parallel_safe；连续只读工具并行执行，有副作用工具按原顺序串行执行，Trace 记录批次信息，结果按 tool_call_id 顺序回传模型。
-- 2026-06-09：补充 Python 多线程与 ThreadPoolExecutor 学习笔记，梳理线程、GIL、submit、Future、result、上下文管理器及其在 MiniCode 并行工具执行中的代码映射。
+- 2026-06-09：补充 Python 多线程与 ThreadPoolExecutor 学习笔记，梳理线程、GIL、submit、Future、result、上下文管理器及其在 Micode 并行工具执行中的代码映射。
+- 2026-07-16：完成项目首个 Micode 改名里程碑，统一品牌、`micode` 包、`MicodeAgent`、`.micode` 状态目录与 `micode` CLI；移除受版本控制的 egg-info 和本地 `config.toml`，新增无密钥配置模板、标准构建配置及带 SHA-256 校验的幂等状态迁移命令，确认 386 项测试和 Python 3.9 安装冒烟通过。

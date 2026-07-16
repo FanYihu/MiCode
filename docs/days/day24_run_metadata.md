@@ -62,9 +62,9 @@ Trace 文件保存下来后，文件名只有时间戳。
 "metadata": self.run.metadata,
 ```
 
-## 修改 MiniCodeAgent
+## 修改 MicodeAgent
 
-`MiniCodeAgent.run(task)` 里可以记录：
+`MicodeAgent.run(task)` 里可以记录：
 
 ```python
 run.metadata["task"] = task
@@ -100,24 +100,24 @@ trace["run"]["metadata"]["workspace"] = workspace_path
 修改：
 
 ```text
-minicode/src/minicode/trace.py
-minicode/src/minicode/agent.py
-minicode/src/minicode/cli.py
+micode/src/micode/trace.py
+micode/src/micode/agent.py
+micode/src/micode/cli.py
 ```
 
 修改测试：
 
 ```text
-minicode/tests/test_trace.py
-minicode/tests/test_agent_integration.py
-minicode/tests/test_cli.py
+micode/tests/test_trace.py
+micode/tests/test_agent_integration.py
+micode/tests/test_cli.py
 ```
 
 ## 建议测试
 
 ```text
 1. TraceRecorder.to_dict 导出 run metadata
-2. MiniCodeAgent.run 记录 task/mode
+2. MicodeAgent.run 记录 task/mode
 3. 如果 TextLLM client 有 provider/model，trace 记录 provider/model
 4. CLI fixed 记录 task/mode/workspace
 ```
@@ -133,7 +133,7 @@ minicode/tests/test_cli.py
 ## 完成后运行
 
 ```bash
-cd /Users/fanyihu/Desktop/技能学习/minicode
+cd /Users/fanyihu/Desktop/技能学习/micode
 PYTHONPATH=src python3 -m pytest
 ```
 

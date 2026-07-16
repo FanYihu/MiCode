@@ -44,7 +44,7 @@ references/MiniCode-Python/minicode/tooling.py
 新增文件：
 
 ```text
-minicode/src/minicode/tool_registry.py
+micode/src/micode/tool_registry.py
 ```
 
 建议结构：
@@ -76,8 +76,8 @@ class ToolRegistry:
 ## 要修改的文件
 
 ```text
-minicode/src/minicode/tool_registry.py
-minicode/tests/test_tool_registry.py
+micode/src/micode/tool_registry.py
+micode/tests/test_tool_registry.py
 docs/SDD.md
 ```
 

@@ -84,7 +84,7 @@ User Task
 
 Embedding Index 是规模扩大后的优化手段，不是 Skill 系统的起点。只有当 Skill 数量增长到一定程度，且 `LLM Router` 的成本、延迟或准确率成为瓶颈时，才有必要引入向量化入库、索引更新和相似度检索。
 
-MiniCode 当前阶段只需要先保证数据结构支持后续扩展，不需要在 Day 36 直接实现路由器。
+Micode 当前阶段只需要先保证数据结构支持后续扩展，不需要在 Day 36 直接实现路由器。
 
 ## 承接已有能力
 
@@ -108,14 +108,14 @@ references/MiniCode-Python/minicode/tools/load_skill.py
 - `SkillSummary`：只包含列表和召回需要的轻量信息。
 - `LoadedSkill`：在 summary 基础上多出完整内容。
 
-本章先实现适合当前 MiniCode 的最小版本。
+本章先实现适合当前 Micode 的最小版本。
 
 ## 建议接口
 
 新增文件：
 
 ```text
-minicode/src/minicode/skills.py
+micode/src/micode/skills.py
 ```
 
 建议结构：
@@ -140,8 +140,8 @@ def format_skill_for_prompt(skill: Skill) -> str:
 ## 要修改的文件
 
 ```text
-minicode/src/minicode/skills.py
-minicode/tests/test_skills.py
+micode/src/micode/skills.py
+micode/tests/test_skills.py
 docs/SDD.md
 ```
 

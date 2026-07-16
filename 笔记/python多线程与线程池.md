@@ -20,7 +20,7 @@ with ThreadPoolExecutor(...)
     自动等待任务完成并关闭线程池
 ```
 
-MiniCode 的并行工具调用就是由这四部分组成的。
+Micode 的并行工具调用就是由这四部分组成的。
 
 ## 进程和线程
 
@@ -56,7 +56,7 @@ Task B:       运行 -> 等待 I/O -> 运行
 
 并行表示多个任务在同一时刻由不同 CPU 核心执行。
 
-MiniCode 使用线程处理文件读取、Git 子进程等待等 I/O 工作。线程在等待磁盘或子进程时，其他线程可以继续运行，因此等待时间能够重叠。
+Micode 使用线程处理文件读取、Git 子进程等待等 I/O 工作。线程在等待磁盘或子进程时，其他线程可以继续运行，因此等待时间能够重叠。
 
 ## GIL
 
@@ -79,7 +79,7 @@ Thread B 获得 GIL -> 执行 Python 字节码
 - 等待子进程
 - `time.sleep()`
 
-所以线程适合 MiniCode 当前的只读工具。
+所以线程适合 Micode 当前的只读工具。
 
 GIL 也不等于业务代码线程安全。多个步骤组成的操作仍可能被其他线程打断：
 
@@ -208,7 +208,7 @@ future.exception()
 
 如果工作线程抛出异常，异常会保存在 Future 中，调用 `future.result()` 时会在等待线程中重新抛出。
 
-MiniCode 的 `ToolRegistry.call()` 会先把大多数工具异常转换成失败的 `ToolResult`，所以 Agent 通常通过 `result.ok` 处理失败。
+Micode 的 `ToolRegistry.call()` 会先把大多数工具异常转换成失败的 `ToolResult`，所以 Agent 通常通过 `result.ok` 处理失败。
 
 ## `future.result()`
 
@@ -268,13 +268,13 @@ finally:
     executor.shutdown(wait=True)
 ```
 
-## MiniCode 中的代码
+## Micode 中的代码
 
 代码位置：
 
 ```text
-src/minicode/agent.py
-MiniCodeAgent._execute_tool_group()
+src/micode/agent.py
+MicodeAgent._execute_tool_group()
 ```
 
 核心实现：
@@ -325,7 +325,7 @@ future-2
 future-3
 ```
 
-MiniCode 也按这个顺序调用 `result()`，所以最终仍是：
+Micode 也按这个顺序调用 `result()`，所以最终仍是：
 
 ```text
 call-1 result
@@ -371,7 +371,7 @@ Thread B 写入新内容
 Thread A 根据旧内容再次覆盖
 ```
 
-所以 MiniCode 采用保守策略：
+所以 Micode 采用保守策略：
 
 ```python
 parallel_safe = True
@@ -395,7 +395,7 @@ parallel_safe = True
 
 ## 分组规则
 
-MiniCode 不会把整批所有只读工具移动到最前面，而是只合并连续的安全调用。
+Micode 不会把整批所有只读工具移动到最前面，而是只合并连续的安全调用。
 
 输入：
 
@@ -441,7 +441,7 @@ run_shell
 - 适合同步 I/O。
 - 共享内存。
 - 接入普通 `def` 函数简单。
-- 当前 MiniCode 使用它。
+- 当前 Micode 使用它。
 
 协程：
 

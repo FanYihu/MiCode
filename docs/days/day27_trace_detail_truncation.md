@@ -7,7 +7,7 @@
 Day 26 的详细模式会完整输出 event content：
 
 ```bash
-python3 -m minicode.cli trace trace.json --detail
+python3 -m micode.cli trace trace.json --detail
 ```
 
 这对小 trace 很方便，但真实运行时 event content 可能非常长：
@@ -21,7 +21,7 @@ Day 27 要让 detail view 支持最大内容长度。
 ## 建议命令
 
 ```bash
-python3 -m minicode.cli trace trace.json --detail --max-content 500
+python3 -m micode.cli trace trace.json --detail --max-content 500
 ```
 
 默认可以设为：
@@ -46,7 +46,7 @@ python3 -m minicode.cli trace trace.json --detail --max-content 500
 放在：
 
 ```text
-minicode/src/minicode/persistence.py
+micode/src/micode/persistence.py
 ```
 
 新增：
@@ -84,15 +84,15 @@ format_trace_detail(trace, max_content: int = 2000)
 修改：
 
 ```text
-minicode/src/minicode/persistence.py
-minicode/src/minicode/cli.py
+micode/src/micode/persistence.py
+micode/src/micode/cli.py
 ```
 
 修改测试：
 
 ```text
-minicode/tests/test_persistence.py
-minicode/tests/test_cli.py
+micode/tests/test_persistence.py
+micode/tests/test_cli.py
 ```
 
 ## 验收标准

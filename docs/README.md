@@ -1,4 +1,4 @@
-# MiniCode 文档导航
+# Micode 文档导航
 
 ## 入口文档
 
@@ -12,10 +12,11 @@
 
 - `stage1/`：Stage 1 架构、已完成能力和遗留问题。
 - `stage2/`：Stage 2 边界、参考项目映射、路线和开发规则。
+- `migration.md`：旧 `.minicode` 状态到 `.micode` 的显式幂等迁移。
 
 ## 学习笔记
 
-- `../笔记/python多线程与线程池.md`：线程、GIL、ThreadPoolExecutor、Future，以及 MiniCode 批量工具并行执行原理。
+- `../笔记/python多线程与线程池.md`：线程、GIL、ThreadPoolExecutor、Future，以及 Micode 批量工具并行执行原理。
 
 ## 使用规则
 

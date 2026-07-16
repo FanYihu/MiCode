@@ -1,7 +1,7 @@
 import json
 
-from minicode.memory.procedural import ProceduralMemory
-from minicode.memory.skill_candidate import (
+from micode.memory.procedural import ProceduralMemory
+from micode.memory.skill_candidate import (
     APPROVED,
     DRAFT,
     PROMOTED,

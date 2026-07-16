@@ -8,7 +8,7 @@ Day 32 已经有了轻量 `ToolRegistry`，但工具结果现在只是 `ok/outpu
 
 ## 为什么做
 
-Trace 是 MiniCode 的可观测性核心。
+Trace 是 Micode 的可观测性核心。
 
 如果每个工具随意写 metadata，后面会很难做：
 
@@ -76,8 +76,8 @@ Shell 工具可以额外保留：
 ## 要修改的文件
 
 ```text
-minicode/src/minicode/tool_registry.py
-minicode/tests/test_tool_registry.py
+micode/src/micode/tool_registry.py
+micode/tests/test_tool_registry.py
 docs/SDD.md
 ```
 
@@ -99,7 +99,7 @@ docs/SDD.md
 - 未知工具也返回相同 metadata 契约。
 - 默认工具的扩展字段统一放进 `details`，例如 `path`、`command`、`exit_code`、`timed_out`。
 - `result_summary` 对长输出做截断，完整内容仍保留在 `ToolResult.output`。
-- `MiniCodeAgent` 改为走 `AgentAction -> ToolRegistry.call(...) -> ToolResult -> Trace + observations`。
+- `MicodeAgent` 改为走 `AgentAction -> ToolRegistry.call(...) -> ToolResult -> Trace + observations`。
 - 权限最初在 ToolDefinition 注册层完成，现已解耦为高优先级 PermissionHook，并复用同一 ToolResult metadata 契约。
 - `TextLLM` 的 prompt 工具说明改为由 Registry 注入，新增工具注册后可以进入模型提示。
 - 补充测试覆盖成功工具、失败工具、未知工具、默认工具、长输出摘要和 Agent 自定义工具调用。

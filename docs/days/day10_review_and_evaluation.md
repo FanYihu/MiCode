@@ -2,7 +2,7 @@
 
 ## 今日目标
 
-对 MiniCode 第一阶段做一次收口：补综合测试、整理架构、复盘你真正掌握了什么。
+对 Micode 第一阶段做一次收口：补综合测试、整理架构、复盘你真正掌握了什么。
 
 这一天不急着加新功能，而是把已有能力变成一个稳定的小项目。
 
@@ -31,7 +31,7 @@ Day 10 要确认三件事：
 ## 你要创建的文件
 
 ```text
-minicode/
+micode/
   docs/
     stage1/
       README.md
@@ -43,7 +43,7 @@ minicode/
 
 保持短小，写清楚：
 
-- MiniCode 第一阶段模块图
+- Micode 第一阶段模块图
 - 每个模块职责
 - 一次任务的执行流程
 - 后续接 LLM 时的替换点
@@ -51,7 +51,7 @@ minicode/
 建议结构：
 
 ```markdown
-# MiniCode 架构说明
+# Micode 架构说明
 
 ## 模块职责
 
@@ -67,7 +67,7 @@ minicode/
 写学习复盘，不要太长：
 
 ```markdown
-# MiniCode 第一阶段复盘
+# Micode 第一阶段复盘
 
 ## 我完成了什么
 
@@ -145,7 +145,7 @@ class SequenceLLM:
 ## 完成后运行
 
 ```bash
-cd /Users/fanyihu/Desktop/技能学习/minicode
+cd /Users/fanyihu/Desktop/技能学习/micode
 PYTHONPATH=src python3 -m pytest
 ```
 

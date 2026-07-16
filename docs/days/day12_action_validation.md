@@ -35,7 +35,7 @@ Agent 项目里有一个很重要的边界：
 两者不是一回事：
 
 ```text
-Action Validation：这个动作能不能被 MiniCode 理解
+Action Validation：这个动作能不能被 Micode 理解
 Permission Review：这个动作理解后能不能执行
 ```
 
@@ -110,7 +110,7 @@ AgentAction(tool="delete_everything", args={})
 第一版可以先放在：
 
 ```text
-minicode/src/minicode/agent.py
+micode/src/micode/agent.py
 ```
 
 因为 `AgentAction` 现在也在这个文件里。
@@ -171,14 +171,14 @@ except InvalidAgentAction as error:
 
 1. 在 `agent.py` 新增 `InvalidAgentAction`。
 2. 在 `agent.py` 新增 `validate_action()`。
-3. 在 `MiniCodeAgent.run()` 里调用校验函数。
+3. 在 `MicodeAgent.run()` 里调用校验函数。
 
 ## 建议测试
 
 新增测试文件：
 
 ```text
-minicode/tests/test_action_validation.py
+micode/tests/test_action_validation.py
 ```
 
 建议测试：
@@ -201,7 +201,7 @@ minicode/tests/test_action_validation.py
 ## 完成后运行
 
 ```bash
-cd /Users/fanyihu/Desktop/技能学习/minicode
+cd /Users/fanyihu/Desktop/技能学习/micode
 PYTHONPATH=src python3 -m pytest
 ```
 

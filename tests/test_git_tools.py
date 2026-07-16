@@ -1,7 +1,7 @@
 import subprocess
 
-from minicode.tools.git import GitTools
-from minicode.workspace import Workspace
+from micode.tools.git import GitTools
+from micode.workspace import Workspace
 
 
 def _init_repo(path) -> None:
@@ -13,7 +13,7 @@ def _init_repo(path) -> None:
         capture_output=True,
     )
     subprocess.run(
-        ["git", "config", "user.name", "MiniCode Test"],
+        ["git", "config", "user.name", "Micode Test"],
         cwd=path,
         check=True,
         capture_output=True,
@@ -39,13 +39,13 @@ def test_git_tools_diff_returns_unstaged_diff(tmp_path):
     file_path.write_text("hello\n", encoding="utf-8")
     subprocess.run(["git", "add", "README.md"], cwd=tmp_path, check=True)
     subprocess.run(["git", "commit", "-m", "initial"], cwd=tmp_path, check=True)
-    file_path.write_text("hello\nminicode\n", encoding="utf-8")
+    file_path.write_text("hello\nmicode\n", encoding="utf-8")
     tools = GitTools(Workspace(str(tmp_path)))
 
     result = tools.diff()
 
     assert result.ok is True
-    assert "+minicode" in result.output
+    assert "+micode" in result.output
     assert result.metadata["exit_code"] == 0
     assert result.metadata["command"] == ["git", "diff"]
 

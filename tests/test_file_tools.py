@@ -1,7 +1,7 @@
 import pytest
 
-from minicode.tools.file import EmptySearchText, FileTools, SearchTextNotFound
-from minicode.workspace import Workspace
+from micode.tools.file import EmptySearchText, FileTools, SearchTextNotFound
+from micode.workspace import Workspace
 
 
 def test_read_file_reads_workspace_file(tmp_path):

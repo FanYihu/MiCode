@@ -4,7 +4,7 @@
 
 从项目目录加载本地 Skill。
 
-Day 36 已经定义了 `Skill` 数据结构。Day 37 要让 MiniCode 能从约定目录读取 `SKILL.md`，转换成 `Skill` 对象。
+Day 36 已经定义了 `Skill` 数据结构。Day 37 要让 Micode 能从约定目录读取 `SKILL.md`，转换成 `Skill` 对象。
 
 ## 为什么做
 
@@ -13,7 +13,7 @@ Skill 不应该只存在于代码里。
 后续用户会把自己的操作流程写成文件，例如：
 
 ```text
-.minicode/skills/python-test/SKILL.md
+.micode/skills/python-test/SKILL.md
 ```
 
 Runtime 需要能扫描这些文件，把它们变成可注入、可路由、可加载的 Skill 对象。
@@ -40,7 +40,7 @@ references/MiniCode-Python/minicode/tools/load_skill.py
 本章先做项目级最小版本：
 
 ```text
-.minicode/skills/<skill-name>/SKILL.md
+.micode/skills/<skill-name>/SKILL.md
 ```
 
 ## 建议接口
@@ -48,7 +48,7 @@ references/MiniCode-Python/minicode/tools/load_skill.py
 在：
 
 ```text
-minicode/src/minicode/skills.py
+micode/src/micode/skills.py
 ```
 
 新增：
@@ -66,8 +66,8 @@ description 可以先取 Markdown 中第一段非标题文本。
 ## 要修改的文件
 
 ```text
-minicode/src/minicode/skills.py
-minicode/tests/test_skills.py
+micode/src/micode/skills.py
+micode/tests/test_skills.py
 docs/SDD.md
 ```
 
@@ -76,7 +76,7 @@ docs/SDD.md
 1. 能从单个 `SKILL.md` 加载 Skill。
 2. Skill name 默认来自父目录名。
 3. description 能从 Markdown 第一段正文提取。
-4. 能扫描 `.minicode/skills/*/SKILL.md`。
+4. 能扫描 `.micode/skills/*/SKILL.md`。
 5. 缺失目录时返回空列表。
 6. 全量测试通过。
 
@@ -84,8 +84,8 @@ docs/SDD.md
 
 - 新增 `extract_skill_description(markdown)`，从第一段非标题正文提取 Skill 描述。
 - 新增 `load_skill_from_file(path)`，从单个 `SKILL.md` 加载 `Skill`，名称默认取父目录名。
-- 新增 `discover_project_skills(workspace)`，扫描项目级 `.minicode/skills/*/SKILL.md`。
-- 缺失 `.minicode/skills` 目录时返回空列表。
+- 新增 `discover_project_skills(workspace)`，扫描项目级 `.micode/skills/*/SKILL.md`。
+- 缺失 `.micode/skills` 目录时返回空列表。
 - 补充测试覆盖单文件加载、description 提取、项目级扫描和缺失目录。
 
 ## 思考题

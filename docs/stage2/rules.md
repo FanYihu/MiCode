@@ -24,7 +24,7 @@ PYTHONPATH=src python3 -m pytest tests -q
 - 参考仓库只读使用。
 - 不复制参考项目源码。
 - 不提交 `references/` 目录。
-- 每章只吸收一个概念，重写成适合当前 MiniCode 的小版本。
+- 每章只吸收一个概念，重写成适合当前 Micode 的小版本。
 
 ## 架构规则
 

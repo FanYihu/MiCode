@@ -2,7 +2,7 @@
 
 ## 今日目标
 
-设计一个稳定的 prompt，让未来的 LLM 按 MiniCode 需要的格式输出 JSON action。
+设计一个稳定的 prompt，让未来的 LLM 按 Micode 需要的格式输出 JSON action。
 
 前面 Day 13 已经有了这条链路：
 
@@ -42,10 +42,10 @@ def build_action_prompt(task: str, observations: list[str]) -> str:
 
 ### 1. Agent 角色
 
-告诉模型它不是聊天助手，而是 MiniCode 的 action generator。
+告诉模型它不是聊天助手，而是 Micode 的 action generator。
 
 ```text
-You are MiniCode's action generator.
+You are Micode's action generator.
 ```
 
 ### 2. 可用工具
@@ -88,7 +88,7 @@ def build_action_prompt(task: str, observations: list[str]) -> str:
     observation_text = "\n\n".join(observations) if observations else "None"
 
     return f"""
-You are MiniCode's action generator.
+You are Micode's action generator.
 
 Available tools:
 - list_files: list workspace files, args={{}}
@@ -134,7 +134,7 @@ TextLLM：调用模型拿到文本 -> parse_action(text)
 建议改一个文件：
 
 ```text
-minicode/src/minicode/agent.py
+micode/src/micode/agent.py
 ```
 
 新增：
@@ -151,7 +151,7 @@ minicode/src/minicode/agent.py
 新增：
 
 ```text
-minicode/tests/test_prompt_builder.py
+micode/tests/test_prompt_builder.py
 ```
 
 建议测试：
@@ -166,7 +166,7 @@ minicode/tests/test_prompt_builder.py
 同时建议补上：
 
 ```text
-minicode/tests/test_action_parser.py
+micode/tests/test_action_parser.py
 ```
 
 至少覆盖：
@@ -187,7 +187,7 @@ minicode/tests/test_action_parser.py
 ## 完成后运行
 
 ```bash
-cd /Users/fanyihu/Desktop/技能学习/minicode
+cd /Users/fanyihu/Desktop/技能学习/micode
 PYTHONPATH=src python3 -m pytest
 ```
 

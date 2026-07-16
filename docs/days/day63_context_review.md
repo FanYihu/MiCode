@@ -38,12 +38,12 @@ trace.json
 CLI：
 
 ```bash
-python3 -m minicode.cli context-review .minicode/traces/xxx.json
+python3 -m micode.cli context-review .micode/traces/xxx.json
 ```
 
 ## 做了什么
 
-- 新增 `minicode/context/review.py`。
+- 新增 `micode/context/review.py`。
 - 新增 `ContextReviewIssue` 和 `ContextReviewReport`。
 - CLI 新增 `context-review` 子命令。
 - 增加健康 trace、预算超限、prompt cache hash mismatch、decision freeze mismatch、artifact hash mismatch 测试。

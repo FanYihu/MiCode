@@ -7,13 +7,13 @@
 Day 20 已经能保存：
 
 ```bash
-python3 -m minicode.cli agent "读取 README" --save-trace
+python3 -m micode.cli agent "读取 README" --save-trace
 ```
 
 Day 21 已经能查看：
 
 ```bash
-python3 -m minicode.cli trace .minicode/traces/xxx.json
+python3 -m micode.cli trace .micode/traces/xxx.json
 ```
 
 但真实使用时，你不一定记得文件名。
@@ -21,7 +21,7 @@ python3 -m minicode.cli trace .minicode/traces/xxx.json
 Day 22 要新增：
 
 ```bash
-python3 -m minicode.cli traces
+python3 -m micode.cli traces
 ```
 
 输出最近保存的 trace 文件列表。
@@ -33,14 +33,14 @@ Trace 文件按时间戳命名，适合机器保存，但人不容易记。
 `traces` 子命令可以帮你快速找到最近一次运行：
 
 ```text
-1. .minicode/traces/2026-06-02T12-30-00Z.json
-2. .minicode/traces/2026-06-02T12-20-00Z.json
+1. .micode/traces/2026-06-02T12-30-00Z.json
+2. .micode/traces/2026-06-02T12-20-00Z.json
 ```
 
 之后再用：
 
 ```bash
-python3 -m minicode.cli trace path/to/file.json
+python3 -m micode.cli trace path/to/file.json
 ```
 
 ## 新增函数
@@ -48,13 +48,13 @@ python3 -m minicode.cli trace path/to/file.json
 建议放在：
 
 ```text
-minicode/src/minicode/persistence.py
+micode/src/micode/persistence.py
 ```
 
 新增：
 
 ```python
-def list_traces(trace_dir: str = ".minicode/traces", limit: int = 10) -> list[str]:
+def list_traces(trace_dir: str = ".micode/traces", limit: int = 10) -> list[str]:
     ...
 ```
 
@@ -68,7 +68,7 @@ def list_traces(trace_dir: str = ".minicode/traces", limit: int = 10) -> list[st
 ## 建议实现
 
 ```python
-def list_traces(trace_dir: str = ".minicode/traces", limit: int = 10) -> list[str]:
+def list_traces(trace_dir: str = ".micode/traces", limit: int = 10) -> list[str]:
     directory = Path(trace_dir)
     if not directory.exists():
         return []
@@ -86,14 +86,14 @@ def list_traces(trace_dir: str = ".minicode/traces", limit: int = 10) -> list[st
 新增子命令：
 
 ```bash
-python3 -m minicode.cli traces --trace-dir .minicode/traces --limit 10
+python3 -m micode.cli traces --trace-dir .micode/traces --limit 10
 ```
 
 输出：
 
 ```text
-1. .minicode/traces/a.json
-2. .minicode/traces/b.json
+1. .micode/traces/a.json
+2. .micode/traces/b.json
 ```
 
 如果没有 trace：
@@ -107,15 +107,15 @@ No traces found.
 修改：
 
 ```text
-minicode/src/minicode/persistence.py
-minicode/src/minicode/cli.py
+micode/src/micode/persistence.py
+micode/src/micode/cli.py
 ```
 
 新增或修改测试：
 
 ```text
-minicode/tests/test_persistence.py
-minicode/tests/test_cli.py
+micode/tests/test_persistence.py
+micode/tests/test_cli.py
 ```
 
 ## 建议测试
@@ -138,7 +138,7 @@ minicode/tests/test_cli.py
 ## 完成后运行
 
 ```bash
-cd /Users/fanyihu/Desktop/技能学习/minicode
+cd /Users/fanyihu/Desktop/技能学习/micode
 PYTHONPATH=src python3 -m pytest
 ```
 

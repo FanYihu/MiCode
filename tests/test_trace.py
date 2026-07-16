@@ -1,5 +1,5 @@
-from minicode.models import EventType, Run, StepType
-from minicode.trace import TraceRecorder
+from micode.models import EventType, Run, StepType
+from micode.trace import TraceRecorder
 
 
 def test_trace_recorder_starts_empty():

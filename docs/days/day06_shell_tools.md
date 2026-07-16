@@ -2,7 +2,7 @@
 
 ## 今日目标
 
-实现 MiniCode 的命令执行工具 `ShellTools`，让 Agent 能在工作区内运行命令并拿到结构化结果。
+实现 Micode 的命令执行工具 `ShellTools`，让 Agent 能在工作区内运行命令并拿到结构化结果。
 
 前面我们已经有：
 
@@ -29,9 +29,9 @@ Coding Agent 修改代码后，必须能验证结果：
 ## 你要创建的文件
 
 ```text
-minicode/
+micode/
   src/
-    minicode/
+    micode/
       shell_tools.py
   tests/
     test_shell_tools.py
@@ -154,7 +154,7 @@ def test_run_success_command(tmp_path):
 但你现在就要记住：
 
 ```text
-ShellTools 是 MiniCode 里风险最高的工具之一。
+ShellTools 是 Micode 里风险最高的工具之一。
 ```
 
 后续所有删除、移动、安装依赖、网络访问等操作，都应该进入权限审核。
@@ -162,7 +162,7 @@ ShellTools 是 MiniCode 里风险最高的工具之一。
 ## 完成后运行
 
 ```bash
-cd /Users/fanyihu/Desktop/技能学习/minicode
+cd /Users/fanyihu/Desktop/技能学习/micode
 PYTHONPATH=src python3 -m pytest
 ```
 

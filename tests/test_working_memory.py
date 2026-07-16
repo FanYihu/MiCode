@@ -1,7 +1,7 @@
 import json
 
-from minicode.memory.session import SessionMessage
-from minicode.memory.working import (
+from micode.memory.session import SessionMessage
+from micode.memory.working import (
     WorkingMemory,
     WorkingMemoryStore,
     truncate_memory_text,

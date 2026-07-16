@@ -1,6 +1,6 @@
 import pytest
 
-from minicode import models
+from micode import models
 
 
 def test_create_run_defaults():

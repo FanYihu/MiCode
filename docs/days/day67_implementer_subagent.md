@@ -59,10 +59,10 @@ Main Agent
 
 ## 做了什么
 
-- 新增 `minicode/subagents/implementer.py`。
+- 新增 `micode/subagents/implementer.py`。
 - 新增 `ImplementerOperation` 和 `ImplementerSubAgent`。
 - `create_default_subagent_executor(workspace)` 支持注册 implementer。
-- `minicode/subagents/__init__.py` 暴露 Implementer 入口。
+- `micode/subagents/__init__.py` 暴露 Implementer 入口。
 - 补充 replace、write、未授权工具、非法 operations 和 ToolRegistry metadata 测试。
 
 ## 学习重点

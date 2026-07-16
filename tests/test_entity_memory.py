@@ -1,4 +1,4 @@
-from minicode.memory.entity import (
+from micode.memory.entity import (
     build_entity_relation_extraction_prompt,
     deterministic_entity_relation_extraction,
     extract_entities_and_relations,
@@ -8,8 +8,8 @@ from minicode.memory.entity import (
     parse_entity_relation_response,
     stable_entity_id,
 )
-from minicode.memory.episodic import EpisodicMemory
-from minicode.memory.semantic import SemanticMemory
+from micode.memory.episodic import EpisodicMemory
+from micode.memory.semantic import SemanticMemory
 
 
 def make_episode() -> EpisodicMemory:
@@ -17,7 +17,7 @@ def make_episode() -> EpisodicMemory:
         id="episode:run-1",
         session_id="session-1",
         run_id="run-1",
-        task="用 pytest 测试 MiniCode CLI",
+        task="用 pytest 测试 Micode CLI",
         outcome="测试通过",
         status="completed",
     )
@@ -25,9 +25,9 @@ def make_episode() -> EpisodicMemory:
 
 def make_semantic_memory() -> SemanticMemory:
     return SemanticMemory(
-        id="semantic:minicode-uses-pytest",
-        fact="MiniCode uses pytest",
-        subject="MiniCode",
+        id="semantic:micode-uses-pytest",
+        fact="Micode uses pytest",
+        subject="Micode",
         predicate="uses",
         object="pytest",
         confidence=0.9,
@@ -55,9 +55,9 @@ def test_deterministic_entity_relation_extraction_uses_semantic_triples():
 
     entity_ids = [entity.id for entity in extraction.entities]
     relation = extraction.relations[0]
-    assert "entity:minicode" in entity_ids
+    assert "entity:micode" in entity_ids
     assert "entity:pytest" in entity_ids
-    assert relation.source_entity_id == "entity:minicode"
+    assert relation.source_entity_id == "entity:micode"
     assert relation.target_entity_id == "entity:pytest"
     assert relation.predicate == "uses"
     assert relation.source_memory_ids == [semantic.id]
@@ -69,16 +69,16 @@ def test_parse_entity_relation_response_canonicalizes_names_and_aliases():
     text = """
 {
   "entities": [
-    {"name": "MiniCode", "type": "project", "aliases": ["minicode"]},
+    {"name": "Micode", "type": "project", "aliases": ["micode"]},
     {"name": "pytest", "type": "library", "aliases": []}
   ],
   "relations": [
     {
-      "source": "minicode",
+      "source": "micode",
       "predicate": "uses",
       "target": "pytest",
       "confidence": 0.95,
-      "source_memory_ids": ["semantic:minicode-uses-pytest"]
+      "source_memory_ids": ["semantic:micode-uses-pytest"]
     }
   ]
 }
@@ -96,16 +96,16 @@ def test_extract_entities_and_relations_uses_llm_then_fallback():
     episode = make_episode()
     semantic = make_semantic_memory()
     client = FakeEntityClient(
-        '{"entities":[{"name":"MiniCode","type":"project"},'
+        '{"entities":[{"name":"Micode","type":"project"},'
         '{"name":"pytest","type":"library"}],'
-        '"relations":[{"source":"MiniCode","predicate":"uses",'
+        '"relations":[{"source":"Micode","predicate":"uses",'
         '"target":"pytest","confidence":0.9,'
-        '"source_memory_ids":["semantic:minicode-uses-pytest"]}]}'
+        '"source_memory_ids":["semantic:micode-uses-pytest"]}]}'
     )
 
     extraction = extract_entities_and_relations(episode, [semantic], client)
 
-    assert extraction.entities[0].name == "MiniCode"
+    assert extraction.entities[0].name == "Micode"
     assert extraction.relations[0].predicate == "uses"
     assert "knowledge graph entity" in client.prompts[0]
 
@@ -127,11 +127,11 @@ def test_entity_prompt_includes_episode_and_semantic_memory():
     )
 
     assert "Return exactly one JSON object" in prompt
-    assert "MiniCode uses pytest" in prompt
+    assert "Micode uses pytest" in prompt
 
 
 def test_entity_ids_and_predicates_are_stable():
-    assert stable_entity_id("MiniCode") == stable_entity_id(" minicode ")
+    assert stable_entity_id("Micode") == stable_entity_id(" micode ")
     assert normalize_predicate("Uses Tool") == "uses_tool"
     assert make_knowledge_entity("pytest", entity_type="library").type == "library"
     assert infer_relation_cardinality("uses") == "multi"

@@ -78,9 +78,9 @@ embedding_client.embed([
 
 ```text
 Relevant Long-Term Memory:
-- [semantic] MiniCode uses pytest
+- [semantic] Micode uses pytest
 - [procedure] update-cli Update CLI behavior and run tests.
-- [graph_fact status=conflicting] MiniCode uses_model model-a
+- [graph_fact status=conflicting] Micode uses_model model-a
 ```
 
 Trace metadata 会记录：
@@ -92,7 +92,7 @@ Trace metadata 会记录：
 
 ## 参考项目学到了什么
 
-参考项目把上下文视为受控资源，而不是无条件塞入所有历史。MiniCode 因此把长期记忆先召回、再压缩注入，并保留每个检索通道的可解释分数。
+参考项目把上下文视为受控资源，而不是无条件塞入所有历史。Micode 因此把长期记忆先召回、再压缩注入，并保留每个检索通道的可解释分数。
 
 ## 验收标准
 

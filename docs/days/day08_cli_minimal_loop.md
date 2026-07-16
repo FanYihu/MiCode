@@ -2,7 +2,7 @@
 
 ## 今日目标
 
-实现一个最小 CLI，让 MiniCode 可以从命令行接收任务，并完成一次可观察的运行。
+实现一个最小 CLI，让 Micode 可以从命令行接收任务，并完成一次可观察的运行。
 
 前面七章已经分别完成：
 
@@ -24,10 +24,10 @@ Day 08 要把它们串起来：
 
 到现在为止，我们有很多模块，但还没有一个“入口”。
 
-CLI 的意义是让 MiniCode 开始像一个真实工具：
+CLI 的意义是让 Micode 开始像一个真实工具：
 
 ```bash
-python3 -m minicode.cli "列出当前项目文件"
+python3 -m micode.cli "列出当前项目文件"
 ```
 
 第一版 CLI 不接大模型，不自动改代码，只做固定动作，把运行链路打通。
@@ -35,9 +35,9 @@ python3 -m minicode.cli "列出当前项目文件"
 ## 你要创建的文件
 
 ```text
-minicode/
+micode/
   src/
-    minicode/
+    micode/
       cli.py
   tests/
     test_cli.py
@@ -48,7 +48,7 @@ minicode/
 命令格式：
 
 ```bash
-PYTHONPATH=src python3 -m minicode.cli "list files" --workspace .
+PYTHONPATH=src python3 -m micode.cli "list files" --workspace .
 ```
 
 最小支持两个任务：
@@ -91,5 +91,5 @@ import json
 2. `list files` 能把工作区文件写入 event。
 3. 不支持的任务不会崩溃，会返回文本事件。
 4. `run tests` 能执行 pytest 并记录 exit_code。
-5. `python3 -m minicode.cli "list files" --workspace .` 能打印 JSON。
+5. `python3 -m micode.cli "list files" --workspace .` 能打印 JSON。
 6. 所有测试通过。

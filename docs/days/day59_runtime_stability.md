@@ -43,7 +43,7 @@ artifact:tool-result:{sha256[:24]}
 Context Assembly 完成后，会写入：
 
 ```text
-.minicode/prompt-cache/{cache-key}.json
+.micode/prompt-cache/{cache-key}.json
 ```
 
 cache key 同样由内容 hash 派生：
@@ -96,7 +96,7 @@ trace["run"]["metadata"]["decision_freezes"]
 ContextLayerAssembler
   -> PromptCacheStore.put(...)
   -> prompt_cache_key
-  -> MiniCodeAgent
+  -> MicodeAgent
   -> before each model turn:
        freeze_decision(...)
   -> ToolResult
@@ -113,7 +113,7 @@ ContextLayerAssembler
 
 ## 参考项目学到了什么
 
-参考项目强调运行过程的可复现与可审计。MiniCode 在本章把“写入产物”和“模型决策输入”都变成稳定可追踪对象，为后续上下文读取、缓存复用和错误复盘打基础。
+参考项目强调运行过程的可复现与可审计。Micode 在本章把“写入产物”和“模型决策输入”都变成稳定可追踪对象，为后续上下文读取、缓存复用和错误复盘打基础。
 
 ## 验收标准
 

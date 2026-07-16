@@ -45,7 +45,7 @@ PermissionHook(priority=1000)
 
 参考项目用事件枚举、HookContext、注册管理器和注销函数表达生命周期扩展点。
 
-当前 MiniCode 沿用这个思想，但按自己的同步 Tool Registry 做了收敛：
+当前 Micode 沿用这个思想，但按自己的同步 Tool Registry 做了收敛：
 
 - 当前只实现工具生命周期，不提前加入 Agent/Session 全部事件。
 - Hook 可以返回结构化 `continue` / `block`，而不只是执行旁路回调。
@@ -54,7 +54,7 @@ PermissionHook(priority=1000)
 
 ## 做了什么
 
-- 新增 `minicode/hooks/` 包。
+- 新增 `micode/hooks/` 包。
 - 新增 Hook 事件、上下文、结果、注册、优先级、注销和统计。
 - `ToolRegistry.call()` 接入 before/after/error 生命周期。
 - PermissionReviewer 通过 PermissionHook 接入默认 Registry。

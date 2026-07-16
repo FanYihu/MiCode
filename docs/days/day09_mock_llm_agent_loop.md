@@ -2,7 +2,7 @@
 
 ## 今日目标
 
-实现一个不依赖真实模型的 Agent Loop，让 MiniCode 从固定任务分发升级为“模型决定下一步动作”。
+实现一个不依赖真实模型的 Agent Loop，让 Micode 从固定任务分发升级为“模型决定下一步动作”。
 
 Day 08 的 CLI 是这样：
 
@@ -33,9 +33,9 @@ Mock LLM 的好处是：
 ## 你要创建的文件
 
 ```text
-minicode/
+micode/
   src/
-    minicode/
+    micode/
       agent.py
   tests/
     test_agent.py
@@ -85,12 +85,12 @@ class MockLLM:
 - 每次返回下一个预设 action
 - 如果 action 用完，返回 final action
 
-## MiniCodeAgent
+## MicodeAgent
 
 定义：
 
 ```python
-class MiniCodeAgent:
+class MicodeAgent:
     def __init__(self, workspace: Workspace, llm: MockLLM) -> None:
         ...
 
@@ -176,7 +176,7 @@ AgentAction(tool="", args={"answer": "任务完成"}, final=True)
 ## 完成后运行
 
 ```bash
-cd /Users/fanyihu/Desktop/技能学习/minicode
+cd /Users/fanyihu/Desktop/技能学习/micode
 PYTHONPATH=src python3 -m pytest
 ```
 

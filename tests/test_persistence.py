@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from minicode.persistence import (
+from micode.persistence import (
     cleanup_traces,
     filter_traces,
     format_trace_detail,
@@ -188,7 +188,7 @@ def test_format_trace_markdown_includes_run_steps_and_final():
 
     report = format_trace_markdown(trace)
 
-    assert "# MiniCode Trace Report" in report
+    assert "# Micode Trace Report" in report
     assert "- status: completed" in report
     assert "- task: 读取 README" in report
     assert "- provider: mimo" in report

@@ -2,7 +2,7 @@
 
 ## 阶段边界
 
-Stage 1 的目标是把 MiniCode 从零搭成一个可测试、可复盘、可接真实模型的最小 coding-agent runtime。
+Stage 1 的目标是把 Micode 从零搭成一个可测试、可复盘、可接真实模型的最小 coding-agent runtime。
 
 这一阶段关注“基础闭环”：
 
@@ -14,7 +14,7 @@ Stage 1 不追求复杂 Skill、Memory、MCP、多 Agent 或上下文压缩；�
 
 ## 架构骨架
 
-MiniCode 的基础 Runtime 由三个核心对象组成：
+Micode 的基础 Runtime 由三个核心对象组成：
 
 - `Run`：一次完整任务，负责状态流转。
 - `Step`：任务中的一个动作，例如模型决策、工具调用、最终回答。
@@ -28,7 +28,7 @@ MiniCode 的基础 Runtime 由三个核心对象组成：
 - `trace.py`：记录 Step/Event，并导出 trace dict。
 - `workspace.py`：管理工作区路径边界，支持文件列表、读取和搜索。
 - `permissions.py`：对文件写入和 shell 命令做 allow/review/deny 审核。
-- `agent.py`：AgentAction、action parser、prompt builder、LLM adapter 和 MiniCodeAgent loop。
+- `agent.py`：AgentAction、action parser、prompt builder、LLM adapter 和 MicodeAgent loop。
 - `cli.py`：命令行入口，支持固定任务、agent 模式和 trace 管理。
 - `persistence.py`：trace 保存、加载、查看、过滤、清理和 Markdown 导出。
 - `tools/registry.py`：统一工具注册、调用、权限检查和工具 trace metadata 契约。

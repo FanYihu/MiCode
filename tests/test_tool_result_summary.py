@@ -1,8 +1,8 @@
-from minicode.context.tool_results import (
+from micode.context.tool_results import (
     summarize_head_tail,
     summarize_tool_result,
 )
-from minicode.tools.registry import ToolResult
+from micode.tools.registry import ToolResult
 
 
 def make_result(output: str, details: dict = None) -> ToolResult:

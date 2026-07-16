@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
-from minicode.memory.ranking import MemoryRankingPolicy
-from minicode.memory.retrieval import MemoryRetrievalResult
+from micode.memory.ranking import MemoryRankingPolicy
+from micode.memory.retrieval import MemoryRetrievalResult
 
 
 def make_result(
@@ -12,7 +12,7 @@ def make_result(
     updated_at: str = "2026-06-01T00:00:00+00:00",
     session_id: str = "",
     status: str = "active",
-    content: str = "MiniCode uses pytest",
+    content: str = "Micode uses pytest",
 ) -> MemoryRetrievalResult:
     return MemoryRetrievalResult(
         id=memory_id,

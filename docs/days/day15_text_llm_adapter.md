@@ -2,7 +2,7 @@
 
 ## 今日目标
 
-把“返回文本的模型”接进 MiniCode 的 action 流程。
+把“返回文本的模型”接进 Micode 的 action 流程。
 
 前面已经有三块：
 
@@ -35,7 +35,7 @@ task + observations
 
 这些不是 Agent Loop 的核心。
 
-所以我们先定义一个很薄的适配层，让 MiniCode 只依赖一个简单能力：
+所以我们先定义一个很薄的适配层，让 Micode 只依赖一个简单能力：
 
 ```python
 client.generate(prompt) -> str
@@ -60,10 +60,10 @@ class TextLLM:
 
 注意：`TextLLM` 和 `MockLLM` 一样，都提供 `next_action()`。
 
-这意味着 `MiniCodeAgent` 不需要改：
+这意味着 `MicodeAgent` 不需要改：
 
 ```python
-agent = MiniCodeAgent(workspace, TextLLM(client))
+agent = MicodeAgent(workspace, TextLLM(client))
 ```
 
 ## 测试用 Fake Client
@@ -100,7 +100,7 @@ client = FakeTextClient(
 )
 
 llm = TextLLM(client)
-agent = MiniCodeAgent(workspace, llm)
+agent = MicodeAgent(workspace, llm)
 trace = agent.run("读取 README")
 ```
 
@@ -119,7 +119,7 @@ Agent 执行 AgentAction
 建议改：
 
 ```text
-minicode/src/minicode/agent.py
+micode/src/micode/agent.py
 ```
 
 新增：
@@ -132,7 +132,7 @@ class TextLLM:
 建议新增测试：
 
 ```text
-minicode/tests/test_text_llm.py
+micode/tests/test_text_llm.py
 ```
 
 ## 建议测试
@@ -142,7 +142,7 @@ minicode/tests/test_text_llm.py
 2. TextLLM 会把 task 放进 prompt
 3. TextLLM 会把 observations 放进 prompt
 4. client 返回非法 JSON 时，TextLLM 抛 InvalidActionText
-5. MiniCodeAgent 可以使用 TextLLM 完成 read_file -> final
+5. MicodeAgent 可以使用 TextLLM 完成 read_file -> final
 ```
 
 ## 重要边界
@@ -162,12 +162,12 @@ minicode/tests/test_text_llm.py
 - 记录 trace
 - 管理 Run 状态
 
-这些仍然属于 `MiniCodeAgent` 和已有模块。
+这些仍然属于 `MicodeAgent` 和已有模块。
 
 ## 验收标准
 
 1. `TextLLM` 暴露 `next_action(task, observations)`。
-2. `MiniCodeAgent` 可以无感使用 `TextLLM`。
+2. `MicodeAgent` 可以无感使用 `TextLLM`。
 3. prompt 会被发送给 client。
 4. client 返回的 JSON 会被解析成合法 `AgentAction`。
 5. 全量测试通过。
@@ -175,7 +175,7 @@ minicode/tests/test_text_llm.py
 ## 完成后运行
 
 ```bash
-cd /Users/fanyihu/Desktop/技能学习/minicode
+cd /Users/fanyihu/Desktop/技能学习/micode
 PYTHONPATH=src python3 -m pytest
 ```
 

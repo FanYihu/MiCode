@@ -2,7 +2,7 @@
 
 ## 今日目标
 
-复盘 Day 31-Day 34，确认 MiniCode 已经从基础 Agent Loop 平滑过渡到可扩展工具 Runtime。
+复盘 Day 31-Day 34，确认 Micode 已经从基础 Agent Loop 平滑过渡到可扩展工具 Runtime。
 
 Day 31 到 Day 34 做了四件关键事：
 
@@ -57,7 +57,7 @@ references/MiniCode-Python/minicode/agent_loop.py
 
 ## 验收标准
 
-1. 文档说明 MiniCode 当前工具 Runtime 的真实结构。
+1. 文档说明 Micode 当前工具 Runtime 的真实结构。
 2. Stage 1 遗留问题中和工具分发、Git 观察相关的内容得到更新。
 3. Stage 2 文档明确下一阶段进入 Skill 主线。
 4. 全量测试通过。

@@ -54,7 +54,7 @@ CONTENT:
 ## 验收标准
 
 1. 默认 Registry 注册 `load_skill`。
-2. 能按 name 加载项目 `.minicode/skills/<name>/SKILL.md`。
+2. 能按 name 加载项目 `.micode/skills/<name>/SKILL.md`。
 3. 未知 Skill 返回 `ok=False`。
 4. 返回 metadata 符合 Tool Trace Contract。
 5. Agent 可以通过 `ToolRegistry.call("load_skill", ...)` 获取完整内容。

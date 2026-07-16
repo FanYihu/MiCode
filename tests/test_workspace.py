@@ -1,6 +1,6 @@
 import pytest
 
-from minicode.workspace import Workspace
+from micode.workspace import Workspace
 
 
 def test_list_files_returns_relative_paths(tmp_path):
@@ -16,21 +16,21 @@ def test_list_files_returns_relative_paths(tmp_path):
 
 
 def test_read_text_reads_file_content(tmp_path):
-    (tmp_path / "hello.txt").write_text("hello minicode", encoding="utf-8")
+    (tmp_path / "hello.txt").write_text("hello micode", encoding="utf-8")
     workspace = Workspace(str(tmp_path))
 
-    assert workspace.read_text("hello.txt") == "hello minicode"
+    assert workspace.read_text("hello.txt") == "hello micode"
 
 
 def test_search_text_returns_matches(tmp_path):
-    (tmp_path / "a.txt").write_text("hello\nminicode\n", encoding="utf-8")
+    (tmp_path / "a.txt").write_text("hello\nmicode\n", encoding="utf-8")
     (tmp_path / "b.txt").write_text("mini agent\nother\n", encoding="utf-8")
     workspace = Workspace(str(tmp_path))
 
-    matches = workspace.search_text("mini")
+    matches = workspace.search_text("mi")
 
     assert matches == [
-        {"path": "a.txt", "line": 2, "text": "minicode"},
+        {"path": "a.txt", "line": 2, "text": "micode"},
         {"path": "b.txt", "line": 1, "text": "mini agent"},
     ]
 

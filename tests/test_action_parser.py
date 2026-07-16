@@ -1,6 +1,6 @@
 import pytest
 
-from minicode.agent import (
+from micode.agent import (
     AgentAction,
     InvalidActionText,
     InvalidAgentAction,

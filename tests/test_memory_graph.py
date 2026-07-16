@@ -1,7 +1,7 @@
 import json
 
-from minicode.memory.episodic import EpisodicMemory
-from minicode.memory.graph import (
+from micode.memory.episodic import EpisodicMemory
+from micode.memory.graph import (
     MemoryEdge,
     MemoryGraph,
     MemoryGraphStore,
@@ -10,13 +10,13 @@ from minicode.memory.graph import (
     make_edge,
     stable_edge_id,
 )
-from minicode.memory.entity import (
+from micode.memory.entity import (
     EntityRelationExtraction,
     KnowledgeEntity,
     KnowledgeRelation,
 )
-from minicode.memory.procedural import ProceduralMemory
-from minicode.memory.semantic import SemanticMemory
+from micode.memory.procedural import ProceduralMemory
+from micode.memory.semantic import SemanticMemory
 
 
 def make_episode() -> EpisodicMemory:
@@ -93,9 +93,9 @@ def test_build_memory_graph_links_all_memory_layers():
 def test_build_memory_graph_adds_entity_relation_subgraph():
     episode = make_episode()
     semantic = SemanticMemory(
-        id="semantic:minicode-uses-pytest",
-        fact="MiniCode uses pytest",
-        subject="MiniCode",
+        id="semantic:micode-uses-pytest",
+        fact="Micode uses pytest",
+        subject="Micode",
         predicate="uses",
         object="pytest",
         source_episode_ids=[episode.id],
@@ -104,8 +104,8 @@ def test_build_memory_graph_adds_entity_relation_subgraph():
     extraction = EntityRelationExtraction(
         entities=[
             KnowledgeEntity(
-                id="entity:minicode",
-                name="MiniCode",
+                id="entity:micode",
+                name="Micode",
                 type="project",
                 source_memory_ids=[semantic.id],
             ),
@@ -118,7 +118,7 @@ def test_build_memory_graph_adds_entity_relation_subgraph():
         ],
         relations=[
             KnowledgeRelation(
-                source_entity_id="entity:minicode",
+                source_entity_id="entity:micode",
                 target_entity_id="entity:pytest",
                 predicate="uses",
                 confidence=0.9,
@@ -144,15 +144,15 @@ def test_build_memory_graph_adds_entity_relation_subgraph():
     entity_edge = next(
         edge
         for edge in graph.edges
-        if edge.source_id == "entity:minicode" and edge.relation == "uses"
+        if edge.source_id == "entity:micode" and edge.relation == "uses"
     )
-    assert node_types["entity:minicode"] == "entity"
+    assert node_types["entity:micode"] == "entity"
     assert node_types["entity:pytest"] == "entity"
-    assert ("entity:minicode", "uses", "entity:pytest") in relations
+    assert ("entity:micode", "uses", "entity:pytest") in relations
     assert (
-        "entity:minicode",
+        "entity:micode",
         "supported_by_memory",
-        "semantic:minicode-uses-pytest",
+        "semantic:micode-uses-pytest",
     ) in relations
     assert entity_edge.properties["confidence"] == 0.9
     assert entity_edge.properties["temporal_fact"] is True
@@ -203,7 +203,7 @@ def test_memory_graph_store_merges_local_graphs(tmp_path):
 def test_graph_merge_preserves_all_relation_sources():
     graph = MemoryGraph()
     first = make_edge(
-        "entity:minicode",
+        "entity:micode",
         "entity:pytest",
         "uses",
         properties={
@@ -212,7 +212,7 @@ def test_graph_merge_preserves_all_relation_sources():
         },
     )
     second = make_edge(
-        "entity:minicode",
+        "entity:micode",
         "entity:pytest",
         "uses",
         properties={

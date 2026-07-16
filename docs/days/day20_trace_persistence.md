@@ -4,10 +4,10 @@
 
 把每次运行的 trace 保存到文件。
 
-现在 MiniCode 已经能返回 trace dict：
+现在 Micode 已经能返回 trace dict：
 
 ```text
-MiniCodeAgent.run(task) -> dict
+MicodeAgent.run(task) -> dict
 run_task(task, workspace) -> dict
 ```
 
@@ -31,12 +31,12 @@ trace dict -> JSON 文件
 项目根目录下：
 
 ```text
-.minicode/
+.micode/
   traces/
     2026-06-02T12-30-00Z.json
 ```
 
-`.minicode` 是运行产物目录。
+`.micode` 是运行产物目录。
 
 后面如果你使用 git，可以把它放进 `.gitignore`。
 
@@ -45,13 +45,13 @@ trace dict -> JSON 文件
 建议新增文件：
 
 ```text
-minicode/src/minicode/persistence.py
+micode/src/micode/persistence.py
 ```
 
 写一个函数：
 
 ```python
-def save_trace(trace: dict, output_dir: str = ".minicode/traces") -> str:
+def save_trace(trace: dict, output_dir: str = ".micode/traces") -> str:
     ...
 ```
 
@@ -70,7 +70,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
-def save_trace(trace: dict, output_dir: str = ".minicode/traces") -> str:
+def save_trace(trace: dict, output_dir: str = ".micode/traces") -> str:
     directory = Path(output_dir)
     directory.mkdir(parents=True, exist_ok=True)
 
@@ -96,7 +96,7 @@ def save_trace(trace: dict, output_dir: str = ".minicode/traces") -> str:
 示例：
 
 ```bash
-python3 -m minicode.cli agent "读取 README" --workspace . --config config.toml --save-trace
+python3 -m micode.cli agent "读取 README" --workspace . --config config.toml --save-trace
 ```
 
 当用户加了 `--save-trace`：
@@ -117,8 +117,8 @@ trace["saved_trace_path"] = save_trace(trace)
 建议两个模式都支持：
 
 ```bash
-python3 -m minicode.cli fixed "list files" --workspace . --save-trace
-python3 -m minicode.cli agent "读取 README" --workspace . --config config.toml --save-trace
+python3 -m micode.cli fixed "list files" --workspace . --save-trace
+python3 -m micode.cli agent "读取 README" --workspace . --config config.toml --save-trace
 ```
 
 ## 你要手写的内容
@@ -126,25 +126,25 @@ python3 -m minicode.cli agent "读取 README" --workspace . --config config.toml
 新增：
 
 ```text
-minicode/src/minicode/persistence.py
+micode/src/micode/persistence.py
 ```
 
 修改：
 
 ```text
-minicode/src/minicode/cli.py
+micode/src/micode/cli.py
 ```
 
 新增测试：
 
 ```text
-minicode/tests/test_persistence.py
+micode/tests/test_persistence.py
 ```
 
 修改测试：
 
 ```text
-minicode/tests/test_cli.py
+micode/tests/test_cli.py
 ```
 
 ## 建议测试
@@ -167,12 +167,12 @@ minicode/tests/test_cli.py
 ## 完成后运行
 
 ```bash
-cd /Users/fanyihu/Desktop/技能学习/minicode
+cd /Users/fanyihu/Desktop/技能学习/micode
 PYTHONPATH=src python3 -m pytest
 ```
 
 ## 思考题
 
-为什么 trace 保存应该放在 CLI 层，而不是直接写死在 `MiniCodeAgent.run()` 里？
+为什么 trace 保存应该放在 CLI 层，而不是直接写死在 `MicodeAgent.run()` 里？
 
 提示：Agent 负责产生 trace；是否保存、保存到哪里，是运行入口的策略。

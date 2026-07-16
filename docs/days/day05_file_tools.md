@@ -2,7 +2,7 @@
 
 ## 今日目标
 
-实现 MiniCode 的第一组文件工具：安全读取、写入和修改预览。
+实现 Micode 的第一组文件工具：安全读取、写入和修改预览。
 
 Day 04 的 `Workspace` 让 Agent 能观察项目。Day 05 要让 Agent 具备最小文件操作能力，但仍然要受路径边界保护。
 
@@ -19,9 +19,9 @@ Coding Agent 最核心的能力不是“回答怎么改”，而是能围绕代�
 ## 你要创建的文件
 
 ```text
-minicode/
+micode/
   src/
-    minicode/
+    micode/
       file_tools.py
   tests/
     test_file_tools.py
@@ -143,7 +143,7 @@ def exists(self, path: str) -> bool:
 ## 完成后运行
 
 ```bash
-cd /Users/fanyihu/Desktop/技能学习/minicode
+cd /Users/fanyihu/Desktop/技能学习/micode
 PYTHONPATH=src python3 -m pytest
 ```
 

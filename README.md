@@ -1,4 +1,4 @@
-# MiniCode 学习项目
+# Micode 学习项目
 
 这是一个本人用于手写 Coding Agent 的学习项目。
 
@@ -15,7 +15,7 @@
 
 ## 当前完成状态
 
-MiniCode 目前已经从最小 Agent Loop，推进到可扩展的 Coding Agent Runtime：
+Micode 目前已经从最小 Agent Loop，推进到可扩展的 Coding Agent Runtime：
 
 - 基础 Runtime：Run / Step / Event、Trace、CLI、Trace 持久化与查看。
 - 工具系统：文件工具、Shell 工具、Git 只读工具、统一 `ToolRegistry`、工具 metadata 契约。
@@ -46,8 +46,8 @@ Skill(name, description, content, tags)
 
 已完成能力：
 
-- 项目级 Skill：读取 `.minicode/skills/*/SKILL.md`。
-- 用户级 Skill：读取 `~/.minicode/skills/*/SKILL.md`。
+- 项目级 Skill：读取 `.micode/skills/*/SKILL.md`。
+- 用户级 Skill：读取 `~/.micode/skills/*/SKILL.md`。
 - 项目级 Skill 优先级最高，直接注入 Summary，不参与筛选。
 - 用户级 / 外部 Skill 通过显式 name 命中或 LLM Router 筛选。
 - 路由画像从 `tags`、`When to use / When not to use` 和 `examples/` 派生，不污染 Skill 四字段契约。
@@ -99,6 +99,28 @@ Session
 
 Memory 的定位是“让 Agent 记住发生过什么、事实是什么、以后怎么做”。正式 Skill 只接收经过 review 的稳定流程。
 
+## 安装与配置
+
+```bash
+python3 -m pip install -e '.[test]'
+cp config.example.toml config.toml
+micode --help
+```
+
+`config.toml` 继续使用本地明文配置，但不会被 Git 跟踪。请只把无密钥的
+`config.example.toml` 当作配置模板提交到仓库。
+
+## 旧状态迁移
+
+项目状态统一写入 `.micode`。旧 `.minicode` 数据只通过显式命令迁移：
+
+```bash
+micode migrate-state
+```
+
+命令逐文件复制并校验 SHA-256，不删除旧目录，也不覆盖内容不同的目标文件；
+重复执行时，相同文件会报告为 `unchanged`。完整约束见 `docs/migration.md`。
+
 ## 学习方式
 
 1. 先读 `docs/SDD.md`，明确为什么做、做什么、怎么做。
@@ -112,3 +134,4 @@ Memory 的定位是“让 Agent 记住发生过什么、事实是什么、以后
 - `docs/stage1/README.md`：第一阶段基础闭环。
 - `docs/stage2/README.md`：第二阶段 Skill、Memory、Context、多 Agent、安全和 MCP 路线。
 - `docs/stage2/roadmap.md`：Day 31 之后的学习章节安排。
+- `docs/migration.md`：从 `.minicode` 到 `.micode` 的幂等迁移说明。

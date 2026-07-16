@@ -1,4 +1,4 @@
-from minicode.skills import (
+from micode.skills import (
     Skill,
     LLMSkillRouter,
     build_skill_rerank_prompt,
@@ -25,7 +25,7 @@ from minicode.skills import (
     route_skills_with_llm,
     select_skills_by_name,
 )
-from minicode.workspace import Workspace
+from micode.workspace import Workspace
 
 
 class FakeRouterClient:
@@ -214,7 +214,7 @@ def test_load_skill_examples_returns_empty_without_source_directory():
 
 
 def test_discover_project_skills_loads_skill_files(tmp_path):
-    skills_root = tmp_path / ".minicode" / "skills"
+    skills_root = tmp_path / ".micode" / "skills"
     (skills_root / "python-test").mkdir(parents=True)
     (skills_root / "python-test" / "SKILL.md").write_text(
         "# Python Test\n\nRun Python tests safely.",
@@ -257,7 +257,7 @@ def test_discover_skills_in_directory_returns_empty_for_missing_root(tmp_path):
 
 
 def test_load_project_skill_returns_skill_by_name(tmp_path):
-    skill_dir = tmp_path / ".minicode" / "skills" / "python-test"
+    skill_dir = tmp_path / ".micode" / "skills" / "python-test"
     skill_dir.mkdir(parents=True)
     (skill_dir / "SKILL.md").write_text(
         "# Python Test\n\nRun Python tests safely.",

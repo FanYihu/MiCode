@@ -1,13 +1,13 @@
-from minicode.memory.episodic import EpisodicMemory, EpisodicMemoryStore
-from minicode.memory.graph import MemoryGraph, MemoryGraphStore, MemoryNode, make_edge
-from minicode.memory.procedural import ProceduralMemory, ProceduralMemoryStore
-from minicode.memory.retrieval import (
+from micode.memory.episodic import EpisodicMemory, EpisodicMemoryStore
+from micode.memory.graph import MemoryGraph, MemoryGraphStore, MemoryNode, make_edge
+from micode.memory.procedural import ProceduralMemory, ProceduralMemoryStore
+from micode.memory.retrieval import (
     HybridMemoryRetriever,
     cosine_similarity,
     format_retrieved_memories,
     keyword_similarity,
 )
-from minicode.memory.semantic import SemanticMemory, SemanticMemoryStore
+from micode.memory.semantic import SemanticMemory, SemanticMemoryStore
 
 
 def seed_memory(memory_dir) -> None:
@@ -25,9 +25,9 @@ def seed_memory(memory_dir) -> None:
     SemanticMemoryStore(str(memory_dir)).upsert_many(
         [
             SemanticMemory(
-                id="semantic:minicode-uses-pytest",
-                fact="MiniCode uses pytest",
-                subject="MiniCode",
+                id="semantic:micode-uses-pytest",
+                fact="Micode uses pytest",
+                subject="Micode",
                 predicate="uses",
                 object="pytest",
                 confidence=0.9,
@@ -35,9 +35,9 @@ def seed_memory(memory_dir) -> None:
                 tags=["test"],
             ),
             SemanticMemory(
-                id="semantic:minicode-uses-old-model",
-                fact="MiniCode uses_model old-model",
-                subject="MiniCode",
+                id="semantic:micode-uses-old-model",
+                fact="Micode uses_model old-model",
+                subject="Micode",
                 predicate="uses_model",
                 object="old-model",
                 source_episode_ids=["episode:run-0"],
@@ -58,40 +58,40 @@ def seed_memory(memory_dir) -> None:
     )
     graph = MemoryGraph(
         nodes=[
-            MemoryNode(id="entity:minicode", type="entity", label="MiniCode"),
+            MemoryNode(id="entity:micode", type="entity", label="Micode"),
             MemoryNode(id="entity:pytest", type="entity", label="pytest"),
             MemoryNode(id="entity:old-model", type="entity", label="old-model"),
             MemoryNode(
-                id="semantic:minicode-uses-pytest",
+                id="semantic:micode-uses-pytest",
                 type="semantic",
-                label="MiniCode uses pytest",
+                label="Micode uses pytest",
             ),
         ],
         edges=[
             make_edge(
-                "entity:minicode",
+                "entity:micode",
                 "entity:pytest",
                 "uses",
                 properties={
                     "temporal_fact": True,
                     "fact_status": "active",
                     "cardinality": "multi",
-                    "source_memory_ids": ["semantic:minicode-uses-pytest"],
+                    "source_memory_ids": ["semantic:micode-uses-pytest"],
                 },
             ),
             make_edge(
-                "entity:minicode",
+                "entity:micode",
                 "entity:old-model",
                 "uses_model",
                 properties={
                     "temporal_fact": True,
                     "fact_status": "superseded",
                     "cardinality": "single",
-                    "source_memory_ids": ["semantic:minicode-uses-old-model"],
+                    "source_memory_ids": ["semantic:micode-uses-old-model"],
                 },
             ),
             make_edge(
-                "semantic:minicode-uses-pytest",
+                "semantic:micode-uses-pytest",
                 "episode:run-1",
                 "derived_from_episode",
             ),
@@ -126,10 +126,10 @@ def test_hybrid_retrieval_combines_keyword_vector_and_graph(tmp_path):
 
     result_by_id = {result.id: result for result in results}
     assert "procedure:update-cli" in result_by_id
-    assert "semantic:minicode-uses-pytest" in result_by_id
+    assert "semantic:micode-uses-pytest" in result_by_id
     assert result_by_id["procedure:update-cli"].keyword_score > 0
     assert result_by_id["procedure:update-cli"].vector_score > 0
-    assert result_by_id["semantic:minicode-uses-pytest"].graph_score > 0
+    assert result_by_id["semantic:micode-uses-pytest"].graph_score > 0
 
 
 def test_retrieval_excludes_superseded_facts_by_default(tmp_path):
@@ -172,21 +172,21 @@ def test_graph_traversal_recalls_neighbor_without_keyword_match(tmp_path):
 
 
 def test_similarity_helpers_handle_valid_and_invalid_inputs():
-    assert keyword_similarity("pytest", "MiniCode uses pytest") > 0
-    assert keyword_similarity("missing", "MiniCode uses pytest") == 0
+    assert keyword_similarity("pytest", "Micode uses pytest") > 0
+    assert keyword_similarity("missing", "Micode uses pytest") == 0
     assert cosine_similarity([1.0, 0.0], [1.0, 0.0]) == 1.0
     assert cosine_similarity([1.0], [1.0, 0.0]) == 0.0
 
 
 def test_format_retrieved_memories_marks_conflicts():
-    from minicode.memory.retrieval import MemoryRetrievalResult
+    from micode.memory.retrieval import MemoryRetrievalResult
 
     text = format_retrieved_memories(
         [
             MemoryRetrievalResult(
                 id="edge:1",
                 type="graph_fact",
-                content="MiniCode uses_model model-a",
+                content="Micode uses_model model-a",
                 score=0.8,
                 status="conflicting",
             )

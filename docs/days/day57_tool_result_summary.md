@@ -44,7 +44,7 @@ ToolRegistry.call(...)
 默认每条工具 observation 最多 `1200` 字符：
 
 ```bash
-minicode agent "运行测试" --tool-result-budget-chars 1200
+micode agent "运行测试" --tool-result-budget-chars 1200
 ```
 
 Trace metadata 新增：
@@ -65,7 +65,7 @@ Trace metadata 新增：
 
 ## 参考项目学到了什么
 
-参考项目区分工具原始结果与上下文表示。MiniCode 先实现确定性摘要，使结果既可审计，又不会无边界占用 Prompt。
+参考项目区分工具原始结果与上下文表示。Micode 先实现确定性摘要，使结果既可审计，又不会无边界占用 Prompt。
 
 ## 验收标准
 

@@ -1,6 +1,6 @@
 import json
 
-from minicode.memory.episodic import (
+from micode.memory.episodic import (
     EpisodicMemory,
     EpisodicMemoryStore,
     episodic_memory_from_trace,

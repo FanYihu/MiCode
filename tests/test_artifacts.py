@@ -1,14 +1,14 @@
 import json
 
-from minicode.context.artifacts import (
+from micode.context.artifacts import (
     ArtifactStore,
     maybe_store_tool_result_artifact,
     safe_artifact_filename,
 )
-from minicode.tools.artifact import read_artifact_tool
-from minicode.tools.default import create_default_tool_registry
-from minicode.tools.registry import ToolResult
-from minicode.workspace import Workspace
+from micode.tools.artifact import read_artifact_tool
+from micode.tools.default import create_default_tool_registry
+from micode.tools.registry import ToolResult
+from micode.workspace import Workspace
 
 
 def test_artifact_store_saves_tool_result_payload(tmp_path):

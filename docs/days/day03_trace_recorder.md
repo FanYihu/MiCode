@@ -37,9 +37,9 @@ Trace 是后续调试、评估、可观测性和恢复任务的基础。
 ## 你要创建的文件
 
 ```text
-minicode/
+micode/
   src/
-    minicode/
+    micode/
       trace.py
   tests/
     test_trace.py
@@ -154,7 +154,7 @@ def to_dict(self) -> dict:
 ## 完成后运行
 
 ```bash
-cd /Users/fanyihu/Desktop/技能学习/minicode
+cd /Users/fanyihu/Desktop/技能学习/micode
 PYTHONPATH=src python3 -m pytest
 ```
 

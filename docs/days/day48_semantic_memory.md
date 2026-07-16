@@ -48,7 +48,7 @@ SemanticMemory(
 
 ## 怎么做
 
-- Semantic Memory 保存为 `.minicode/memory/semantic.json`。
+- Semantic Memory 保存为 `.micode/memory/semantic.json`。
 - `semantic_memories_from_episode()` 优先调用当前 LLM client 抽取结构化 facts。
 - LLM 抽取失败或返回空时，使用确定性兜底。
 - 同一事实的 id 由 `subject + predicate + object` 生成，跨 episode 重复出现时合并来源。
@@ -61,7 +61,7 @@ SemanticMemory(
 3. LLM 失败时能回退到确定性提炼。
 4. 相同事实跨 episode 会合并 source episode / run。
 5. SemanticMemoryStore 可以保存、upsert、search。
-6. CLI session run 会写入 `.minicode/memory/semantic.json`。
+6. CLI session run 会写入 `.micode/memory/semantic.json`。
 7. 全量测试通过。
 
 ## 做了什么

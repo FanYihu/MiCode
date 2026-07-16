@@ -1,8 +1,8 @@
 import json
 from pathlib import Path
 
-from minicode.agent import AgentAction
-from minicode.cli import (
+from micode.agent import AgentAction
+from micode.cli import (
     maybe_save_trace,
     run_context_review,
     run_memory_review,
@@ -13,7 +13,7 @@ from minicode.cli import (
     run_trace_list,
     run_trace_viewer,
 )
-from minicode.models import RunStatus, StepType
+from micode.models import RunStatus, StepType
 
 
 def test_cli_list_files(tmp_path):
@@ -83,8 +83,8 @@ def test_run_agent_task_uses_configured_llm(monkeypatch, tmp_path):
             self.index += 1
             return action
 
-    monkeypatch.setattr("minicode.cli.create_llm_from_config", lambda path: SequenceLLM())
-    monkeypatch.setattr("minicode.cli.discover_user_skills", lambda: [])
+    monkeypatch.setattr("micode.cli.create_llm_from_config", lambda path: SequenceLLM())
+    monkeypatch.setattr("micode.cli.discover_user_skills", lambda: [])
     (tmp_path / "README.md").write_text("hello", encoding="utf-8")
 
     trace = run_agent_task("列出文件", str(tmp_path), "config.toml")
@@ -113,7 +113,7 @@ def test_run_agent_task_discovers_project_skills_without_routing(monkeypatch, tm
 
     class TextLikeLLM:
         def __init__(self):
-            from minicode.agent import DEFAULT_TOOL_DESCRIPTIONS
+            from micode.agent import DEFAULT_TOOL_DESCRIPTIONS
 
             self.client = RouterAndAgentClient()
             self.tool_descriptions = DEFAULT_TOOL_DESCRIPTIONS
@@ -126,7 +126,7 @@ def test_run_agent_task_discovers_project_skills_without_routing(monkeypatch, tm
             self.skill_summaries = skill_summaries
 
         def next_action(self, task, observations):
-            from minicode.agent import build_action_prompt, parse_action
+            from micode.agent import build_action_prompt, parse_action
 
             prompt = build_action_prompt(
                 task,
@@ -137,16 +137,16 @@ def test_run_agent_task_discovers_project_skills_without_routing(monkeypatch, tm
             return parse_action(self.client.generate(prompt))
 
     llm = TextLikeLLM()
-    monkeypatch.setattr("minicode.cli.create_llm_from_config", lambda path: llm)
-    monkeypatch.setattr("minicode.cli.discover_user_skills", lambda: [])
+    monkeypatch.setattr("micode.cli.create_llm_from_config", lambda path: llm)
+    monkeypatch.setattr("micode.cli.discover_user_skills", lambda: [])
     for index in range(21):
-        skill_dir = tmp_path / ".minicode" / "skills" / f"skill-{index}"
+        skill_dir = tmp_path / ".micode" / "skills" / f"skill-{index}"
         skill_dir.mkdir(parents=True)
         (skill_dir / "SKILL.md").write_text(
             "# General\n\nGeneral helper.",
             encoding="utf-8",
         )
-    selected_dir = tmp_path / ".minicode" / "skills" / "python-test"
+    selected_dir = tmp_path / ".micode" / "skills" / "python-test"
     selected_dir.mkdir(parents=True)
     (selected_dir / "SKILL.md").write_text(
         "# Python Test\n\nRun Python tests safely.\n\nUse pytest.",
@@ -182,7 +182,7 @@ def test_run_agent_task_routes_user_skills_with_llm(monkeypatch, tmp_path):
 
     class TextLikeLLM:
         def __init__(self):
-            from minicode.agent import DEFAULT_TOOL_DESCRIPTIONS
+            from micode.agent import DEFAULT_TOOL_DESCRIPTIONS
 
             self.client = RouterAndAgentClient()
             self.tool_descriptions = DEFAULT_TOOL_DESCRIPTIONS
@@ -195,7 +195,7 @@ def test_run_agent_task_routes_user_skills_with_llm(monkeypatch, tmp_path):
             self.skill_summaries = skill_summaries
 
         def next_action(self, task, observations):
-            from minicode.agent import build_action_prompt, parse_action
+            from micode.agent import build_action_prompt, parse_action
 
             prompt = build_action_prompt(
                 task,
@@ -205,12 +205,12 @@ def test_run_agent_task_routes_user_skills_with_llm(monkeypatch, tmp_path):
             )
             return parse_action(self.client.generate(prompt))
 
-    from minicode.skills import Skill
+    from micode.skills import Skill
 
     llm = TextLikeLLM()
-    monkeypatch.setattr("minicode.cli.create_llm_from_config", lambda path: llm)
+    monkeypatch.setattr("micode.cli.create_llm_from_config", lambda path: llm)
     monkeypatch.setattr(
-        "minicode.cli.discover_user_skills",
+        "micode.cli.discover_user_skills",
         lambda: [Skill(name="user-test", description="User test flow.", content="")],
     )
 
@@ -231,7 +231,7 @@ def test_run_agent_task_records_run_in_session(monkeypatch, tmp_path):
 
     class TextLikeLLM:
         def __init__(self):
-            from minicode.agent import TextLLM
+            from micode.agent import TextLLM
 
             self.inner = TextLLM(Client())
             self.client = self.inner.client
@@ -247,8 +247,8 @@ def test_run_agent_task_records_run_in_session(monkeypatch, tmp_path):
 
     session_dir = tmp_path / "sessions"
     memory_dir = tmp_path / "memory"
-    monkeypatch.setattr("minicode.cli.create_llm_from_config", lambda path: TextLikeLLM())
-    monkeypatch.setattr("minicode.cli.discover_user_skills", lambda: [])
+    monkeypatch.setattr("micode.cli.create_llm_from_config", lambda path: TextLikeLLM())
+    monkeypatch.setattr("micode.cli.discover_user_skills", lambda: [])
 
     trace = run_agent_task(
         "继续学习",
@@ -256,7 +256,7 @@ def test_run_agent_task_records_run_in_session(monkeypatch, tmp_path):
         "config.toml",
         session_id="session-1",
         session_dir=str(session_dir),
-        session_title="MiniCode 学习",
+        session_title="Micode 学习",
         memory_dir=str(memory_dir),
         skill_candidate_dir=str(tmp_path / "skill-candidates"),
     )
@@ -316,7 +316,7 @@ def test_run_agent_task_records_run_in_session(monkeypatch, tmp_path):
     )
     assert any(node["type"] == "entity" for node in memory_graph["nodes"])
     assert "Session Context:" in trace["run"]["metadata"]["compressed_context"]
-    assert session["title"] == "MiniCode 学习"
+    assert session["title"] == "Micode 学习"
     assert session["run_ids"] == [trace["run"]["id"]]
     assert [message["role"] for message in messages] == ["user", "assistant"]
     assert [message["content"] for message in messages] == ["继续学习", "完成"]
@@ -339,7 +339,7 @@ def test_run_agent_task_records_run_in_session(monkeypatch, tmp_path):
 
 
 def test_run_skill_candidate_review_generates_and_promotes(tmp_path):
-    from minicode.memory.procedural import ProceduralMemory, ProceduralMemoryStore
+    from micode.memory.procedural import ProceduralMemory, ProceduralMemoryStore
 
     memory_dir = tmp_path / "memory"
     candidate_dir = tmp_path / "skill-candidates"
@@ -381,9 +381,9 @@ def test_run_skill_candidate_review_generates_and_promotes(tmp_path):
 
 
 def test_run_agent_task_injects_existing_session_context(monkeypatch, tmp_path):
-    from minicode.memory.context import SessionSummary, SessionSummaryStore
-    from minicode.memory.session import SessionMessage, SessionMessageStore, SessionStore
-    from minicode.memory.working import WorkingMemory, WorkingMemoryStore
+    from micode.memory.context import SessionSummary, SessionSummaryStore
+    from micode.memory.session import SessionMessage, SessionMessageStore, SessionStore
+    from micode.memory.working import WorkingMemory, WorkingMemoryStore
 
     class ContextCapturingLLM:
         def __init__(self):
@@ -435,8 +435,8 @@ def test_run_agent_task_injects_existing_session_context(monkeypatch, tmp_path):
         )
     )
     llm = ContextCapturingLLM()
-    monkeypatch.setattr("minicode.cli.create_llm_from_config", lambda path: llm)
-    monkeypatch.setattr("minicode.cli.discover_user_skills", lambda: [])
+    monkeypatch.setattr("micode.cli.create_llm_from_config", lambda path: llm)
+    monkeypatch.setattr("micode.cli.discover_user_skills", lambda: [])
 
     trace = run_agent_task(
         "继续学习",
@@ -456,7 +456,7 @@ def test_run_agent_task_injects_existing_session_context(monkeypatch, tmp_path):
 
 
 def test_run_agent_task_injects_retrieved_long_term_memory(monkeypatch, tmp_path):
-    from minicode.memory.semantic import SemanticMemory, SemanticMemoryStore
+    from micode.memory.semantic import SemanticMemory, SemanticMemoryStore
 
     class ContextCapturingLLM:
         def __init__(self):
@@ -479,9 +479,9 @@ def test_run_agent_task_injects_retrieved_long_term_memory(monkeypatch, tmp_path
     SemanticMemoryStore(str(memory_dir)).upsert_many(
         [
             SemanticMemory(
-                id="semantic:minicode-uses-pytest",
-                fact="MiniCode uses pytest",
-                subject="MiniCode",
+                id="semantic:micode-uses-pytest",
+                fact="Micode uses pytest",
+                subject="Micode",
                 predicate="uses",
                 object="pytest",
                 tags=["test"],
@@ -489,8 +489,8 @@ def test_run_agent_task_injects_retrieved_long_term_memory(monkeypatch, tmp_path
         ]
     )
     llm = ContextCapturingLLM()
-    monkeypatch.setattr("minicode.cli.create_llm_from_config", lambda path: llm)
-    monkeypatch.setattr("minicode.cli.discover_user_skills", lambda: [])
+    monkeypatch.setattr("micode.cli.create_llm_from_config", lambda path: llm)
+    monkeypatch.setattr("micode.cli.discover_user_skills", lambda: [])
 
     trace = run_agent_task(
         "如何使用 pytest",
@@ -501,9 +501,9 @@ def test_run_agent_task_injects_retrieved_long_term_memory(monkeypatch, tmp_path
 
     final = trace["events"][-1]["content"]
     assert "Relevant Long-Term Memory:" in final
-    assert "MiniCode uses pytest" in final
+    assert "Micode uses pytest" in final
     assert trace["run"]["metadata"]["retrieved_memory_ids"] == [
-        "semantic:minicode-uses-pytest"
+        "semantic:micode-uses-pytest"
     ]
     assert trace["run"]["metadata"]["retrieved_memories"][0]["ranking_score"] > 0
     assert trace["run"]["metadata"]["memory_injection"]["selected_count"] == 1
@@ -517,7 +517,7 @@ def test_run_agent_task_injects_retrieved_long_term_memory(monkeypatch, tmp_path
 
 
 def test_run_agent_task_respects_memory_injection_budget(monkeypatch, tmp_path):
-    from minicode.memory.semantic import SemanticMemory, SemanticMemoryStore
+    from micode.memory.semantic import SemanticMemory, SemanticMemoryStore
 
     class ContextCapturingLLM:
         def __init__(self):
@@ -551,8 +551,8 @@ def test_run_agent_task_respects_memory_injection_budget(monkeypatch, tmp_path):
         ]
     )
     llm = ContextCapturingLLM()
-    monkeypatch.setattr("minicode.cli.create_llm_from_config", lambda path: llm)
-    monkeypatch.setattr("minicode.cli.discover_user_skills", lambda: [])
+    monkeypatch.setattr("micode.cli.create_llm_from_config", lambda path: llm)
+    monkeypatch.setattr("micode.cli.discover_user_skills", lambda: [])
 
     trace = run_agent_task(
         "pytest",
@@ -586,8 +586,8 @@ def test_run_agent_task_passes_artifact_options_to_agent(monkeypatch, tmp_path):
             return AgentAction(tool="", args={"answer": observations[-1]}, final=True)
 
     (tmp_path / "large.txt").write_text("z" * 300, encoding="utf-8")
-    monkeypatch.setattr("minicode.cli.create_llm_from_config", lambda path: LLM())
-    monkeypatch.setattr("minicode.cli.discover_user_skills", lambda: [])
+    monkeypatch.setattr("micode.cli.create_llm_from_config", lambda path: LLM())
+    monkeypatch.setattr("micode.cli.discover_user_skills", lambda: [])
 
     trace = run_agent_task(
         "large",
@@ -620,8 +620,8 @@ def test_run_agent_task_records_prompt_cache_and_decision_freeze(monkeypatch, tm
         def next_action(self, task, observations):
             return AgentAction(tool="", args={"answer": "完成"}, final=True)
 
-    monkeypatch.setattr("minicode.cli.create_llm_from_config", lambda path: LLM())
-    monkeypatch.setattr("minicode.cli.discover_user_skills", lambda: [])
+    monkeypatch.setattr("micode.cli.create_llm_from_config", lambda path: LLM())
+    monkeypatch.setattr("micode.cli.discover_user_skills", lambda: [])
 
     trace = run_agent_task(
         "cache freeze",
@@ -638,9 +638,9 @@ def test_run_agent_task_records_prompt_cache_and_decision_freeze(monkeypatch, tm
 
 
 def test_run_agent_task_respects_context_layer_budget(monkeypatch, tmp_path):
-    from minicode.memory.context import SessionSummary, SessionSummaryStore
-    from minicode.memory.session import SessionMessage, SessionMessageStore, SessionStore
-    from minicode.memory.working import WorkingMemory, WorkingMemoryStore
+    from micode.memory.context import SessionSummary, SessionSummaryStore
+    from micode.memory.session import SessionMessage, SessionMessageStore, SessionStore
+    from micode.memory.working import WorkingMemory, WorkingMemoryStore
 
     class ContextCapturingLLM:
         def __init__(self):
@@ -689,8 +689,8 @@ def test_run_agent_task_respects_context_layer_budget(monkeypatch, tmp_path):
         )
     )
     llm = ContextCapturingLLM()
-    monkeypatch.setattr("minicode.cli.create_llm_from_config", lambda path: llm)
-    monkeypatch.setattr("minicode.cli.discover_user_skills", lambda: [])
+    monkeypatch.setattr("micode.cli.create_llm_from_config", lambda path: llm)
+    monkeypatch.setattr("micode.cli.discover_user_skills", lambda: [])
 
     trace = run_agent_task(
         "继续学习",
@@ -717,8 +717,8 @@ def test_run_agent_task_respects_context_layer_budget(monkeypatch, tmp_path):
 
 
 def test_run_agent_task_records_auto_compaction_metadata(monkeypatch, tmp_path):
-    from minicode.memory.context import SessionSummary, SessionSummaryStore
-    from minicode.memory.session import SessionStore
+    from micode.memory.context import SessionSummary, SessionSummaryStore
+    from micode.memory.session import SessionStore
 
     class ContextCapturingLLM:
         def __init__(self):
@@ -747,10 +747,10 @@ def test_run_agent_task_records_auto_compaction_metadata(monkeypatch, tmp_path):
         )
     )
     monkeypatch.setattr(
-        "minicode.cli.create_llm_from_config",
+        "micode.cli.create_llm_from_config",
         lambda path: ContextCapturingLLM(),
     )
-    monkeypatch.setattr("minicode.cli.discover_user_skills", lambda: [])
+    monkeypatch.setattr("micode.cli.discover_user_skills", lambda: [])
 
     trace = run_agent_task(
         "继续学习",
@@ -869,7 +869,7 @@ def test_run_trace_viewer_returns_markdown_when_requested(tmp_path):
 
     report = run_trace_viewer(str(trace_path), markdown=True)
 
-    assert report.startswith("# MiniCode Trace Report")
+    assert report.startswith("# Micode Trace Report")
     assert "- task: 读取 README" in report
     assert "1. final" in report
     assert "完成" in report
@@ -892,7 +892,7 @@ def test_run_trace_viewer_saves_markdown_when_output_is_provided(tmp_path):
 
     assert output == f"Markdown report saved to {output_path}"
     assert output_path.exists()
-    assert "# MiniCode Trace Report" in output_path.read_text(encoding="utf-8")
+    assert "# Micode Trace Report" in output_path.read_text(encoding="utf-8")
 
 
 def test_run_trace_viewer_markdown_takes_priority_over_detail(tmp_path):
@@ -906,7 +906,7 @@ def test_run_trace_viewer_markdown_takes_priority_over_detail(tmp_path):
 
     report = run_trace_viewer(str(trace_path), detail=True, markdown=True)
 
-    assert report.startswith("# MiniCode Trace Report")
+    assert report.startswith("# Micode Trace Report")
     assert "id: run-1" not in report
 
 

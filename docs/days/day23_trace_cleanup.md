@@ -19,7 +19,7 @@ Day 23 要补一个维护能力：
 cleanup_traces()
 ```
 
-避免 `.minicode/traces` 目录越来越大。
+避免 `.micode/traces` 目录越来越大。
 
 ## 为什么需要
 
@@ -28,7 +28,7 @@ cleanup_traces()
 如果每次运行都 `--save-trace`，目录会快速堆满：
 
 ```text
-.minicode/traces/
+.micode/traces/
   2026-06-02T12-00-00Z.json
   2026-06-02T12-01-00Z.json
   ...
@@ -41,13 +41,13 @@ cleanup_traces()
 放在：
 
 ```text
-minicode/src/minicode/persistence.py
+micode/src/micode/persistence.py
 ```
 
 新增：
 
 ```python
-def cleanup_traces(trace_dir: str = ".minicode/traces", keep: int = 20) -> list[str]:
+def cleanup_traces(trace_dir: str = ".micode/traces", keep: int = 20) -> list[str]:
     ...
 ```
 
@@ -62,7 +62,7 @@ def cleanup_traces(trace_dir: str = ".minicode/traces", keep: int = 20) -> list[
 ## 建议实现
 
 ```python
-def cleanup_traces(trace_dir: str = ".minicode/traces", keep: int = 20) -> list[str]:
+def cleanup_traces(trace_dir: str = ".micode/traces", keep: int = 20) -> list[str]:
     paths = list_traces(trace_dir=trace_dir, limit=10_000)
     deleted = []
 
@@ -78,7 +78,7 @@ def cleanup_traces(trace_dir: str = ".minicode/traces", keep: int = 20) -> list[
 新增子命令：
 
 ```bash
-python3 -m minicode.cli cleanup-traces --trace-dir .minicode/traces --keep 20
+python3 -m micode.cli cleanup-traces --trace-dir .micode/traces --keep 20
 ```
 
 输出：
@@ -98,15 +98,15 @@ No trace files deleted.
 修改：
 
 ```text
-minicode/src/minicode/persistence.py
-minicode/src/minicode/cli.py
+micode/src/micode/persistence.py
+micode/src/micode/cli.py
 ```
 
 修改测试：
 
 ```text
-minicode/tests/test_persistence.py
-minicode/tests/test_cli.py
+micode/tests/test_persistence.py
+micode/tests/test_cli.py
 ```
 
 ## 建议测试
@@ -128,7 +128,7 @@ minicode/tests/test_cli.py
 ## 完成后运行
 
 ```bash
-cd /Users/fanyihu/Desktop/技能学习/minicode
+cd /Users/fanyihu/Desktop/技能学习/micode
 PYTHONPATH=src python3 -m pytest
 ```
 

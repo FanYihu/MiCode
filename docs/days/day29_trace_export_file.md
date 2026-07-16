@@ -7,7 +7,7 @@
 Day 28 已经能在终端输出 Markdown：
 
 ```bash
-python3 -m minicode.cli trace trace.json --markdown
+python3 -m micode.cli trace trace.json --markdown
 ```
 
 Day 29 要进一步支持导出文件，方便直接放进学习笔记目录。
@@ -23,7 +23,7 @@ Day 29 要进一步支持导出文件，方便直接放进学习笔记目录。
 ## 建议命令
 
 ```bash
-python3 -m minicode.cli trace trace.json --markdown --output notes/trace-report.md
+python3 -m micode.cli trace trace.json --markdown --output notes/trace-report.md
 ```
 
 ## 建议函数
@@ -31,7 +31,7 @@ python3 -m minicode.cli trace trace.json --markdown --output notes/trace-report.
 放在：
 
 ```text
-minicode/src/minicode/persistence.py
+micode/src/micode/persistence.py
 ```
 
 新增：
@@ -50,10 +50,10 @@ def write_text_report(content: str, output_path: str) -> str:
 ## 要修改的文件
 
 ```text
-minicode/src/minicode/persistence.py
-minicode/src/minicode/cli.py
-minicode/tests/test_persistence.py
-minicode/tests/test_cli.py
+micode/src/micode/persistence.py
+micode/src/micode/cli.py
+micode/tests/test_persistence.py
+micode/tests/test_cli.py
 ```
 
 ## 验收标准

@@ -34,7 +34,7 @@ Day 25 要让 `traces` 子命令支持按这些字段过滤。
 放在：
 
 ```text
-minicode/src/minicode/persistence.py
+micode/src/micode/persistence.py
 ```
 
 新增：
@@ -60,10 +60,10 @@ def filter_traces(
 ## CLI 示例
 
 ```bash
-python3 -m minicode.cli traces --mode agent
-python3 -m minicode.cli traces --provider mimo
-python3 -m minicode.cli traces --model mimo-v2.5-pro
-python3 -m minicode.cli traces --task-contains README
+python3 -m micode.cli traces --mode agent
+python3 -m micode.cli traces --provider mimo
+python3 -m micode.cli traces --model mimo-v2.5-pro
+python3 -m micode.cli traces --task-contains README
 ```
 
 ## 你要手写的内容
@@ -71,15 +71,15 @@ python3 -m minicode.cli traces --task-contains README
 修改：
 
 ```text
-minicode/src/minicode/persistence.py
-minicode/src/minicode/cli.py
+micode/src/micode/persistence.py
+micode/src/micode/cli.py
 ```
 
 修改测试：
 
 ```text
-minicode/tests/test_persistence.py
-minicode/tests/test_cli.py
+micode/tests/test_persistence.py
+micode/tests/test_cli.py
 ```
 
 ## 验收标准

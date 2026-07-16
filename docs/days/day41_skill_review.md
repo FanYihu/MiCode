@@ -51,7 +51,7 @@ Day 41 要确认边界：
 ## 遗留问题
 
 - `route_skills` 当前只是小规模全量返回和大规模关键词兜底。
-- Skill 目前只从项目 `.minicode/skills` 加载，还没有全局 Skill、用户 Skill 或优先级合并。
+- Skill 目前只从项目 `.micode/skills` 加载，还没有全局 Skill、用户 Skill 或优先级合并。
 - Skill 内容进入 observations 后还没有做压缩和 artifact 外置，这会留到 Context 主线处理。
 - 成功/失败运行经验还没有沉淀为 Memory，这正是下一章要开始解决的问题。
 

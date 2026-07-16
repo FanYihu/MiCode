@@ -2,18 +2,18 @@ import threading
 import time
 import json
 
-from minicode.agent import (
+from micode.agent import (
     AgentAction,
     AgentTurn,
     InvalidActionText,
     LLMError,
-    MiniCodeAgent,
+    MicodeAgent,
 )
-from minicode.context.artifacts import ArtifactStore
-from minicode.models import EventType, RunStatus, StepType
-from minicode.skills import LLMSkillRouter, Skill
-from minicode.tools.registry import ToolDefinition, ToolRegistry, ToolResult
-from minicode.workspace import Workspace
+from micode.context.artifacts import ArtifactStore
+from micode.models import EventType, RunStatus, StepType
+from micode.skills import LLMSkillRouter, Skill
+from micode.tools.registry import ToolDefinition, ToolRegistry, ToolResult
+from micode.workspace import Workspace
 
 
 class SequenceLLM:
@@ -94,8 +94,8 @@ class SkillObservationLLM:
 
 
 def test_agent_reads_file_then_finishes(tmp_path):
-    (tmp_path / "README.md").write_text("hello minicode", encoding="utf-8")
-    agent = MiniCodeAgent(
+    (tmp_path / "README.md").write_text("hello micode", encoding="utf-8")
+    agent = MicodeAgent(
         Workspace(str(tmp_path)),
         SequenceLLM(
             [
@@ -112,7 +112,7 @@ def test_agent_reads_file_then_finishes(tmp_path):
         StepType.TOOL.value,
         StepType.FINAL.value,
     ]
-    assert "hello minicode" in trace["events"][0]["content"]
+    assert "hello micode" in trace["events"][0]["content"]
     assert trace["events"][-1]["content"] == "读取完成"
     assert trace["run"]["metadata"]["task"] == "read README"
     assert trace["run"]["metadata"]["mode"] == "agent"
@@ -131,7 +131,7 @@ def test_agent_records_provider_and_model_metadata(tmp_path):
         def next_action(self, task, observations):
             return self.actions.pop(0)
 
-    agent = MiniCodeAgent(Workspace(str(tmp_path)), LLM())
+    agent = MicodeAgent(Workspace(str(tmp_path)), LLM())
 
     trace = agent.run("metadata test")
 
@@ -140,7 +140,7 @@ def test_agent_records_provider_and_model_metadata(tmp_path):
 
 
 def test_agent_denies_dangerous_shell_command(tmp_path):
-    agent = MiniCodeAgent(
+    agent = MicodeAgent(
         Workspace(str(tmp_path)),
         SequenceLLM(
             [
@@ -176,7 +176,7 @@ def test_agent_routes_tool_actions_through_tool_registry(tmp_path):
             ),
         )
     )
-    agent = MiniCodeAgent(
+    agent = MicodeAgent(
         Workspace(str(tmp_path)),
         SequenceLLM(
             [
@@ -221,7 +221,7 @@ def test_agent_summarizes_observation_but_keeps_full_trace_output(tmp_path):
             return AgentAction(tool="", args={"answer": "完成"}, final=True)
 
     llm = ObservationLLM()
-    trace = MiniCodeAgent(
+    trace = MicodeAgent(
         Workspace(str(tmp_path)),
         llm,
         tool_registry=registry,
@@ -266,7 +266,7 @@ def test_agent_returns_summary_to_native_tool_protocol(tmp_path):
             self.recorded.append((action.tool_call_id, output))
 
     llm = NativeLLM()
-    trace = MiniCodeAgent(
+    trace = MicodeAgent(
         Workspace(str(tmp_path)),
         llm,
         tool_registry=registry,
@@ -304,7 +304,7 @@ def test_agent_externalizes_large_tool_result_as_artifact(tmp_path):
 
     artifact_dir = tmp_path / "artifacts"
     llm = ObservationLLM()
-    trace = MiniCodeAgent(
+    trace = MicodeAgent(
         Workspace(str(tmp_path)),
         llm,
         tool_registry=registry,
@@ -333,7 +333,7 @@ def test_agent_records_decision_freeze_for_each_model_turn(tmp_path):
             handler=lambda args: ToolResult(ok=True, output="hello"),
         )
     )
-    agent = MiniCodeAgent(
+    agent = MicodeAgent(
         Workspace(str(tmp_path)),
         SequenceLLM(
             [
@@ -390,7 +390,7 @@ def test_agent_returns_artifact_placeholder_to_native_tool_protocol(tmp_path):
             self.recorded.append(output)
 
     llm = NativeLLM()
-    trace = MiniCodeAgent(
+    trace = MicodeAgent(
         Workspace(str(tmp_path)),
         llm,
         tool_registry=registry,
@@ -432,7 +432,7 @@ def test_default_agent_can_read_saved_artifact(tmp_path):
             return AgentAction(tool="", args={"answer": "完成"}, final=True)
 
     llm = ReadArtifactLLM()
-    trace = MiniCodeAgent(
+    trace = MicodeAgent(
         Workspace(str(tmp_path)),
         llm,
         artifact_dir=str(artifact_dir),
@@ -467,7 +467,7 @@ def test_agent_injects_native_tool_definitions_and_records_call_id(tmp_path):
             )
 
     llm = NativeLLM()
-    agent = MiniCodeAgent(Workspace(str(tmp_path)), llm)
+    agent = MicodeAgent(Workspace(str(tmp_path)), llm)
 
     trace = agent.run("列出文件")
 
@@ -503,7 +503,7 @@ def test_agent_returns_tool_result_to_native_llm_protocol(tmp_path):
             self.recorded.append((action.tool_call_id, action.tool, output))
 
     llm = NativeLLM()
-    agent = MiniCodeAgent(Workspace(str(tmp_path)), llm)
+    agent = MicodeAgent(Workspace(str(tmp_path)), llm)
 
     trace = agent.run("列出文件")
 
@@ -565,7 +565,7 @@ def test_agent_executes_parallel_safe_batch_concurrently(tmp_path):
             self.recorded.extend(results)
 
     llm = BatchLLM()
-    agent = MiniCodeAgent(
+    agent = MicodeAgent(
         Workspace(str(tmp_path)),
         llm,
         tool_registry=registry,
@@ -652,7 +652,7 @@ def test_agent_keeps_mutating_tools_sequential_in_mixed_batch(tmp_path):
                 ]
             )
 
-    trace = MiniCodeAgent(
+    trace = MicodeAgent(
         Workspace(str(tmp_path)),
         BatchLLM(),
         tool_registry=registry,
@@ -698,7 +698,7 @@ def test_agent_stops_remaining_sequential_tools_after_failure(tmp_path):
                 ]
             )
 
-    trace = MiniCodeAgent(
+    trace = MicodeAgent(
         Workspace(str(tmp_path)),
         BatchLLM(),
         tool_registry=registry,
@@ -710,13 +710,13 @@ def test_agent_stops_remaining_sequential_tools_after_failure(tmp_path):
 
 
 def test_agent_loads_skill_content_through_tool_registry(tmp_path):
-    skill_dir = tmp_path / ".minicode" / "skills" / "python-test"
+    skill_dir = tmp_path / ".micode" / "skills" / "python-test"
     skill_dir.mkdir(parents=True)
     (skill_dir / "SKILL.md").write_text(
         "# Python Test\n\nRun Python tests safely.\n\nUse pytest.",
         encoding="utf-8",
     )
-    agent = MiniCodeAgent(Workspace(str(tmp_path)), SkillObservationLLM())
+    agent = MicodeAgent(Workspace(str(tmp_path)), SkillObservationLLM())
 
     trace = agent.run("run python tests")
 
@@ -740,7 +740,7 @@ def test_agent_selects_skills_with_llm_router_before_loop(tmp_path):
         )
     )
     llm = PromptCapturingLLM()
-    agent = MiniCodeAgent(
+    agent = MicodeAgent(
         Workspace(str(tmp_path)),
         llm,
         skills=skills,
@@ -766,7 +766,7 @@ def test_agent_always_includes_project_skills_without_router(tmp_path):
         content="User content.",
     )
     llm = PromptCapturingLLM()
-    agent = MiniCodeAgent(
+    agent = MicodeAgent(
         Workspace(str(tmp_path)),
         llm,
         skills=[external_skill],
@@ -781,7 +781,7 @@ def test_agent_always_includes_project_skills_without_router(tmp_path):
 
 
 def test_agent_records_unknown_registry_tool_as_tool_error(tmp_path):
-    agent = MiniCodeAgent(
+    agent = MicodeAgent(
         Workspace(str(tmp_path)),
         SequenceLLM([AgentAction(tool="missing", args={})]),
     )
@@ -795,7 +795,7 @@ def test_agent_records_unknown_registry_tool_as_tool_error(tmp_path):
 
 
 def test_agent_fails_when_max_steps_exceeded(tmp_path):
-    agent = MiniCodeAgent(
+    agent = MicodeAgent(
         Workspace(str(tmp_path)),
         RepeatingLLM(AgentAction(tool="list_files", args={})),
     )
@@ -807,7 +807,7 @@ def test_agent_fails_when_max_steps_exceeded(tmp_path):
 
 
 def test_agent_records_invalid_action_text_as_model_error(tmp_path):
-    agent = MiniCodeAgent(
+    agent = MicodeAgent(
         Workspace(str(tmp_path)),
         ErrorLLM(InvalidActionText("action text must be valid json")),
     )
@@ -821,7 +821,7 @@ def test_agent_records_invalid_action_text_as_model_error(tmp_path):
 
 
 def test_agent_records_llm_error_as_model_error(tmp_path):
-    agent = MiniCodeAgent(
+    agent = MicodeAgent(
         Workspace(str(tmp_path)),
         ErrorLLM(LLMError("llm request failed")),
     )

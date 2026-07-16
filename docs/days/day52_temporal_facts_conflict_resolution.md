@@ -40,12 +40,12 @@ source entity + predicate
 示例：
 
 ```text
-MiniCode --uses_model--> model-a
+Micode --uses_model--> model-a
 observed_at: 2026-06-01
 status: superseded
 valid_to: 2026-06-09
 
-MiniCode --uses_model--> model-b
+Micode --uses_model--> model-b
 observed_at: 2026-06-09
 status: active
 ```
@@ -53,8 +53,8 @@ status: active
 多值关系：
 
 ```text
-MiniCode --uses--> pytest  active
-MiniCode --uses--> ruff    active
+Micode --uses--> pytest  active
+Micode --uses--> ruff    active
 ```
 
 ## 关键边界
@@ -67,7 +67,7 @@ MiniCode --uses--> ruff    active
 
 ## 参考项目学到了什么
 
-参考项目强调事件和状态变化可审计。MiniCode 将这个原则应用到知识图谱：新事实不会悄悄覆盖旧事实，而是显式记录事实何时失效、被谁替代、依据来自哪里。
+参考项目强调事件和状态变化可审计。Micode 将这个原则应用到知识图谱：新事实不会悄悄覆盖旧事实，而是显式记录事实何时失效、被谁替代、依据来自哪里。
 
 ## 验收标准
 

@@ -46,11 +46,11 @@ Main Agent
 
 ## 做了什么
 
-- 新增 `minicode/subagents/reviewer.py`。
+- 新增 `micode/subagents/reviewer.py`。
 - 新增 `ReviewerFinding` 和 `ReviewerSubAgent`。
-- 新增 `minicode/subagents/router.py`。
+- 新增 `micode/subagents/router.py`。
 - 新增 `RoleBasedSubAgentExecutor` 和 `create_default_subagent_executor()`。
-- 更新 `minicode/subagents/__init__.py` 暴露默认入口。
+- 更新 `micode/subagents/__init__.py` 暴露默认入口。
 - 补充 Reviewer、角色分发、默认 executor 和 ToolRegistry metadata 测试。
 - 确认 `tests/test_subagents.py` 全部通过。
 

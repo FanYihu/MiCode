@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from minicode.memory.context import (
+from micode.memory.context import (
     ContextCompressor,
     SessionSummary,
     SessionSummaryStore,
@@ -13,8 +13,8 @@ from minicode.memory.context import (
     limit_summary_lines,
     parse_summary_response,
 )
-from minicode.memory.session import SessionMessage
-from minicode.memory.working import WorkingMemory
+from micode.memory.session import SessionMessage
+from micode.memory.working import WorkingMemory
 
 
 def make_message(index: int, role: str = "assistant") -> SessionMessage:

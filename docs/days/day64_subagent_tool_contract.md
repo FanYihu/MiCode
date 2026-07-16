@@ -4,7 +4,7 @@
 
 多 Agent 不能从“再启动一个 Agent”开始，否则控制权、权限、上下文和 Trace 很快就会分裂。
 
-MiniCode 先把 SubAgent 定义成主 Agent 可以调用的受控 Tool：主 Agent 负责授权和验收，SubAgent 只执行一个有边界的子任务。
+Micode 先把 SubAgent 定义成主 Agent 可以调用的受控 Tool：主 Agent 负责授权和验收，SubAgent 只执行一个有边界的子任务。
 
 ## 做什么
 
@@ -45,10 +45,10 @@ Main Agent
 
 ## 做了什么
 
-- 新增 `minicode/subagents/models.py`。
-- 新增 `minicode/subagents/tool.py`。
+- 新增 `micode/subagents/models.py`。
+- 新增 `micode/subagents/tool.py`。
 - 默认 Tool Registry 支持可选注册 `run_subagent`。
-- `MiniCodeAgent` 支持注入 SubAgent executor 和 policy。
+- `MicodeAgent` 支持注入 SubAgent executor 和 policy。
 - 子任务自动记录当前主 Run id。
 - 增加契约、限权、错误结果、可选注册和完整 Agent 调用测试。
 

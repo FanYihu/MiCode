@@ -26,7 +26,7 @@ ContextLayerAssembler
   -> estimate_tokens(layer original / used)
   -> ContextAssembly.estimated_tokens
 
-MiniCodeAgent.run()
+MicodeAgent.run()
   -> 每轮模型调用前
   -> estimate_text_parts(task / observations / session_context / tools / skills)
   -> run.metadata["token_estimates"]
@@ -39,10 +39,10 @@ CLI run_agent_task()
 
 ## 做了什么
 
-- 新增 `minicode/context/tokens.py`。
+- 新增 `micode/context/tokens.py`。
 - `ContextLayerResult` 增加 `original_tokens`、`used_tokens`。
 - `ContextAssembly` 增加 `estimated_tokens`。
-- `MiniCodeAgent` 每轮记录 `token_estimates`。
+- `MicodeAgent` 每轮记录 `token_estimates`。
 - CLI 增加 `context_token_estimate`，并写入 prompt cache metadata。
 - 增加 Token Estimate、Context Layer、Agent、CLI 测试。
 

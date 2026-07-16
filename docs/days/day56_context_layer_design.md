@@ -13,7 +13,7 @@ Day56 的目标是把上下文变成“分层资源”，每一层都有来源�
 
 ## 做什么
 
-新增 `minicode/context/layers.py`：
+新增 `micode/context/layers.py`：
 
 - `ContextLayer`：一块上下文来源。
 - `ContextLayerResult`：某层是否被注入、是否截断、使用多少字符。
@@ -61,7 +61,7 @@ long_term_memory layer budget = memory_budget_chars
 CLI 参数：
 
 ```bash
-minicode agent "继续任务" \
+micode agent "继续任务" \
   --context-budget-chars 4000 \
   --memory-budget-chars 1800
 ```
@@ -104,7 +104,7 @@ Trace metadata：
 
 ## 参考项目学到了什么
 
-参考项目把上下文作为有层级、有预算、有审计信息的运行资源。MiniCode 这一章先实现最小可运行版本，让后续 Tool Result Summary、Artifact Placeholder 和 Auto Compaction 都可以接入同一套层模型。
+参考项目把上下文作为有层级、有预算、有审计信息的运行资源。Micode 这一章先实现最小可运行版本，让后续 Tool Result Summary、Artifact Placeholder 和 Auto Compaction 都可以接入同一套层模型。
 
 ## 验收标准
 
@@ -117,6 +117,6 @@ Trace metadata：
 
 ## 做了什么
 
-新增 `minicode/context/layers.py`，实现上下文分层、优先级排序、字符预算和截断审计。
+新增 `micode/context/layers.py`，实现上下文分层、优先级排序、字符预算和截断审计。
 
 CLI 的 Agent 模式改为通过 Context Layer 组合 Session Context 与 Long-term Memory，并记录 `context_assembly` metadata。

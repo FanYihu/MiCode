@@ -7,12 +7,12 @@ Day50 的 Memory Graph 已经能表达“某条记忆来自哪个 episode”，�
 例如：
 
 ```text
-MiniCode uses pytest
+Micode uses pytest
 ```
 
 真正的知识图谱需要识别：
 
-- `MiniCode` 是项目实体。
+- `Micode` 是项目实体。
 - `pytest` 是库实体。
 - 两者之间存在 `uses` 关系。
 
@@ -46,16 +46,16 @@ LLM 返回：
 ```json
 {
   "entities": [
-    {"name": "MiniCode", "type": "project"},
+    {"name": "Micode", "type": "project"},
     {"name": "pytest", "type": "library"}
   ],
   "relations": [
     {
-      "source": "MiniCode",
+      "source": "Micode",
       "predicate": "uses",
       "target": "pytest",
       "confidence": 0.9,
-      "source_memory_ids": ["semantic:minicode-uses-pytest"]
+      "source_memory_ids": ["semantic:micode-uses-pytest"]
     }
   ]
 }
@@ -64,9 +64,9 @@ LLM 返回：
 图中会形成：
 
 ```text
-entity:minicode --uses--> entity:pytest
-entity:minicode --supported_by_memory--> semantic:minicode-uses-pytest
-entity:pytest --supported_by_memory--> semantic:minicode-uses-pytest
+entity:micode --uses--> entity:pytest
+entity:micode --supported_by_memory--> semantic:micode-uses-pytest
+entity:pytest --supported_by_memory--> semantic:micode-uses-pytest
 ```
 
 ## 关键边界
@@ -78,7 +78,7 @@ entity:pytest --supported_by_memory--> semantic:minicode-uses-pytest
 
 ## 参考项目学到了什么
 
-参考项目强调结构化状态和可追溯来源。MiniCode 在此基础上把长期记忆拆成“事实节点、实体节点、关系边、来源边”，避免把知识图谱做成无法审计的黑盒文本集合。
+参考项目强调结构化状态和可追溯来源。Micode 在此基础上把长期记忆拆成“事实节点、实体节点、关系边、来源边”，避免把知识图谱做成无法审计的黑盒文本集合。
 
 ## 验收标准
 
@@ -93,4 +93,4 @@ entity:pytest --supported_by_memory--> semantic:minicode-uses-pytest
 
 新增 `memory/entity.py`，实现 LLM 优先、确定性兜底的实体关系抽取。
 
-扩展 Memory Graph 和 CLI 记忆管线，把实体节点、语义关系和来源关系自动写入 `.minicode/memory/graph.json`。
+扩展 Memory Graph 和 CLI 记忆管线，把实体节点、语义关系和来源关系自动写入 `.micode/memory/graph.json`。

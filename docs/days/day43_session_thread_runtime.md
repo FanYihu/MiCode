@@ -2,7 +2,7 @@
 
 ## 今日目标
 
-实现 MiniCode 的最小会话层。
+实现 Micode 的最小会话层。
 
 这章不做长期记忆抽取，而是先让多次 Run 能归属于同一个 Session。
 
@@ -49,7 +49,7 @@ Session(
 
 - `Agent` 只把 `session_id` 写入 Run metadata。
 - `CLI` 负责 Session 持久化。
-- Session 文件先保存在 `.minicode/sessions/{session_id}.json`。
+- Session 文件先保存在 `.micode/sessions/{session_id}.json`。
 - 后续 Day44 再把 Event Log / Message History 接到 Session 上。
 
 ## 验收标准
@@ -64,7 +64,7 @@ Session(
 ## 做了什么
 
 - 新增 `session.py`，实现 `Session` 和 `SessionStore`。
-- `MiniCodeAgent` 支持 `session_id`，并写入 Run metadata。
+- `MicodeAgent` 支持 `session_id`，并写入 Run metadata。
 - `run_agent_task()` 支持 `session_id`、`session_dir` 和 `session_title`。
 - CLI `agent` 子命令新增 `--session-id`、`--session-dir`、`--session-title`。
 - 补充 Session 单元测试和 CLI 集成测试。

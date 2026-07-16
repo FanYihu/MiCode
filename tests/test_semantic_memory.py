@@ -1,7 +1,7 @@
 import json
 
-from minicode.memory.episodic import episodic_memory_from_trace
-from minicode.memory.semantic import (
+from micode.memory.episodic import episodic_memory_from_trace
+from micode.memory.semantic import (
     SemanticMemory,
     SemanticMemoryStore,
     build_semantic_extraction_prompt,

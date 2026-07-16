@@ -1,9 +1,0 @@
-Metadata-Version: 2.4
-Name: minicode
-Version: 0.1.0
-Summary: A learning project for building a small coding agent runtime.
-Requires-Python: >=3.9
-Requires-Dist: openai
-Requires-Dist: tomli; python_version < "3.11"
-Provides-Extra: test
-Requires-Dist: pytest; extra == "test"

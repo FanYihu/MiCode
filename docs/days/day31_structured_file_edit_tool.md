@@ -2,7 +2,7 @@
 
 ## 今日目标
 
-给 MiniCode 增加结构化文件编辑工具。
+给 Micode 增加结构化文件编辑工具。
 
 现在 `FileTools` 已经能读文件、写文件和生成 diff，但这还不够适合 Agent 自动改代码。直接整文件写入风险比较高，也不方便在 trace 里看清楚“具体改了哪一段”。
 
@@ -42,7 +42,7 @@ references/MiniCode-Python/minicode/tools/patch_file.py
 放在：
 
 ```text
-minicode/src/minicode/file_tools.py
+micode/src/micode/file_tools.py
 ```
 
 新增：
@@ -76,8 +76,8 @@ class SearchTextNotFound(ValueError):
 ## 要修改的文件
 
 ```text
-minicode/src/minicode/file_tools.py
-minicode/tests/test_file_tools.py
+micode/src/micode/file_tools.py
+micode/tests/test_file_tools.py
 ```
 
 ## 验收标准

@@ -50,7 +50,7 @@ EpisodicMemory(
 
 ## 怎么做
 
-- Episode 保存为 `.minicode/memory/episodes.json`。
+- Episode 保存为 `.micode/memory/episodes.json`。
 - `episodic_memory_from_trace()` 从 trace 中提炼一次经历。
 - `outcome` 优先取最终 assistant 文本；没有 final 时取 error；再没有时取最近事件内容。
 - `tool_names` 从 steps metadata 提取并去重。
@@ -63,7 +63,7 @@ EpisodicMemory(
 2. Episode 包含 session_id、run_id、task、outcome、status。
 3. Episode 记录本次用过的工具和关键证据。
 4. EpisodicMemoryStore 可以 upsert、读取和按 session 查询。
-5. CLI agent session 模式会写入 `.minicode/memory/episodes.json`。
+5. CLI agent session 模式会写入 `.micode/memory/episodes.json`。
 6. 全量测试通过。
 
 ## 做了什么

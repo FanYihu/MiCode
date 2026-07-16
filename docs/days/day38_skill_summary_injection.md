@@ -4,7 +4,7 @@
 
 实现小规模 Skill 策略：把 Skill Summary 注入 prompt。
 
-Day 37 已经能从项目目录加载 Skill。Day 38 不做粗召回，也不做精排。当前 MiniCode 的 Skill 数量会很少，直接注入所有 Skill Summary 更简单，也不容易漏掉有用 Skill。
+Day 37 已经能从项目目录加载 Skill。Day 38 不做粗召回，也不做精排。当前 Micode 的 Skill 数量会很少，直接注入所有 Skill Summary 更简单，也不容易漏掉有用 Skill。
 
 ## 为什么做
 
@@ -43,7 +43,7 @@ references/MiniCode-Python/minicode/tools/load_skill.py
 在：
 
 ```text
-minicode/src/minicode/skills.py
+micode/src/micode/skills.py
 ```
 
 新增：
@@ -67,8 +67,8 @@ Available Skills:
 ## 要修改的文件
 
 ```text
-minicode/src/minicode/skills.py
-minicode/tests/test_skills.py
+micode/src/micode/skills.py
+micode/tests/test_skills.py
 docs/SDD.md
 ```
 

@@ -11,7 +11,7 @@ Day69 增加 Fork Mode，让子 Agent 可以在临时 workspace 中运行，不�
 新增 `ForkedSubAgentExecutor`：
 
 - 复制当前 workspace 到临时目录。
-- 跳过 `.git`、`.minicode`、`.pytest_cache`、`__pycache__`。
+- 跳过 `.git`、`.micode`、`.pytest_cache`、`__pycache__`。
 - 在 fork workspace 中创建新的默认 SubAgent executor。
 - 执行原始 `SubAgentTask`。
 - 把 `fork_root`、原始 workspace 和是否保留 fork 写入 metadata。
@@ -21,7 +21,7 @@ Day69 增加 Fork Mode，让子 Agent 可以在临时 workspace 中运行，不�
 ```text
 SubAgentTask
   -> ForkedSubAgentExecutor
-  -> copy workspace to /tmp/minicode-subagent-fork-...
+  -> copy workspace to /tmp/micode-subagent-fork-...
   -> create_default_subagent_executor(fork_workspace)
   -> inner_executor.execute(task)
   -> SubAgentResult(metadata.fork_mode)

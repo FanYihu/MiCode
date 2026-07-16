@@ -29,7 +29,7 @@ def format_trace_markdown(trace: dict) -> str:
 输出大概长这样：
 
 ```markdown
-# MiniCode Trace Report
+# Micode Trace Report
 
 ## Run
 
@@ -50,10 +50,10 @@ def format_trace_markdown(trace: dict) -> str:
 ## 要修改的文件
 
 ```text
-minicode/src/minicode/persistence.py
-minicode/src/minicode/cli.py
-minicode/tests/test_persistence.py
-minicode/tests/test_cli.py
+micode/src/micode/persistence.py
+micode/src/micode/cli.py
+micode/tests/test_persistence.py
+micode/tests/test_cli.py
 ```
 
 ## CLI 入口
@@ -61,7 +61,7 @@ minicode/tests/test_cli.py
 建议在现有 trace 子命令上增加：
 
 ```bash
-python3 -m minicode.cli trace trace.json --markdown
+python3 -m micode.cli trace trace.json --markdown
 ```
 
 规则：

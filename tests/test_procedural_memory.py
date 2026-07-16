@@ -1,7 +1,7 @@
 import json
 
-from minicode.memory.episodic import EpisodicMemory, episodic_memory_from_trace
-from minicode.memory.procedural import (
+from micode.memory.episodic import EpisodicMemory, episodic_memory_from_trace
+from micode.memory.procedural import (
     ProceduralMemory,
     ProceduralMemoryStore,
     deterministic_procedural_memories_from_episode,

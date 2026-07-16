@@ -58,7 +58,7 @@ client.generate(prompt) -> str
 
 - 测试时用 `FakeTextClient`
 - 真实运行时用 `OpenAITextClient`
-- 以后换模型或换供应商时，`MiniCodeAgent` 不需要改
+- 以后换模型或换供应商时，`MicodeAgent` 不需要改
 
 ## 建议新增类
 
@@ -88,7 +88,7 @@ class OpenAITextClient:
 workspace = Workspace("/path/to/project")
 client = OpenAITextClient()
 llm = TextLLM(client)
-agent = MiniCodeAgent(workspace, llm)
+agent = MicodeAgent(workspace, llm)
 
 trace = agent.run("读取 README 并总结")
 ```
@@ -96,7 +96,7 @@ trace = agent.run("读取 README 并总结")
 执行链路：
 
 ```text
-MiniCodeAgent
+MicodeAgent
   -> TextLLM.next_action()
   -> build_action_prompt()
   -> OpenAITextClient.generate()
@@ -141,7 +141,7 @@ export OPENAI_API_KEY="your_api_key_here"
 建议改：
 
 ```text
-minicode/src/minicode/agent.py
+micode/src/micode/agent.py
 ```
 
 新增：
@@ -154,7 +154,7 @@ class OpenAITextClient:
 建议新增测试：
 
 ```text
-minicode/tests/test_openai_text_client.py
+micode/tests/test_openai_text_client.py
 ```
 
 测试先不要真的请求 OpenAI。
@@ -169,7 +169,7 @@ minicode/tests/test_openai_text_client.py
 ## 完成后运行
 
 ```bash
-cd /Users/fanyihu/Desktop/技能学习/minicode
+cd /Users/fanyihu/Desktop/技能学习/micode
 PYTHONPATH=src python3 -m pytest
 ```
 

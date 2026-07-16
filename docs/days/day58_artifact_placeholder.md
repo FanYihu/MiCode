@@ -60,7 +60,7 @@ Artifact 文件格式：
 Prompt 占位符：
 
 ```text
-[artifact id=artifact:tool-result:... kind=tool_result size_chars=12000 path=.minicode/artifacts/tool-results/...json]
+[artifact id=artifact:tool-result:... kind=tool_result size_chars=12000 path=.micode/artifacts/tool-results/...json]
 ```
 
 ## CLI
@@ -68,8 +68,8 @@ Prompt 占位符：
 新增参数：
 
 ```bash
-minicode agent "读取大文件" \
-  --artifact-dir .minicode/artifacts \
+micode agent "读取大文件" \
+  --artifact-dir .micode/artifacts \
   --artifact-threshold-chars 8000
 ```
 
@@ -89,7 +89,7 @@ minicode agent "读取大文件" \
 
 ## 参考项目学到了什么
 
-参考项目会把大上下文拆成可引用的外部资源，而不是无条件塞回模型。MiniCode 这一章先实现本地 artifact placeholder，让大结果可追踪、可验证、可按需读取。
+参考项目会把大上下文拆成可引用的外部资源，而不是无条件塞回模型。Micode 这一章先实现本地 artifact placeholder，让大结果可追踪、可验证、可按需读取。
 
 ## 验收标准
 

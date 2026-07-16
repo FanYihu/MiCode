@@ -1,10 +1,10 @@
 import json
 
-from minicode.cli import run_context_review
-from minicode.context.artifacts import ArtifactStore
-from minicode.context.prompt_cache import PromptCacheStore
-from minicode.context.review import review_context_trace
-from minicode.tools.registry import ToolResult
+from micode.cli import run_context_review
+from micode.context.artifacts import ArtifactStore
+from micode.context.prompt_cache import PromptCacheStore
+from micode.context.review import review_context_trace
+from micode.tools.registry import ToolResult
 
 
 def make_context_trace(tmp_path) -> dict:

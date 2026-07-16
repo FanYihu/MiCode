@@ -1,5 +1,5 @@
-from minicode.tools.shell import ShellTools
-from minicode.workspace import Workspace
+from micode.tools.shell import ShellTools
+from micode.workspace import Workspace
 
 
 def test_run_success_command(tmp_path):

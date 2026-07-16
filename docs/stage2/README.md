@@ -4,7 +4,7 @@
 
 Stage 2 承接 Stage 1 已经完成的最小 runtime，不推倒重来。
 
-Stage 2 的目标是把 MiniCode 从“能跑通 agent loop”升级为“可扩展、可复盘、可受控的 coding-agent runtime”。
+Stage 2 的目标是把 Micode 从“能跑通 agent loop”升级为“可扩展、可复盘、可受控的 coding-agent runtime”。
 
 这一阶段从当前 Day 31 继续：
 
@@ -16,7 +16,7 @@ Stage 2 的目标是把 MiniCode 从“能跑通 agent loop”升级为“可扩
 
 Day 31-Day 34 已经完成基础过渡层：
 
-- `MiniCodeAgent` 不再按工具名写硬编码分支，而是统一走 `ToolRegistry.call(...)`。
+- `MicodeAgent` 不再按工具名写硬编码分支，而是统一走 `ToolRegistry.call(...)`。
 - 新增工具只需要注册 `ToolDefinition`，并提供 `handler`。
 - Hook Runtime 提供 `before_tool_call`、`after_tool_call`、`tool_error` 生命周期。
 - 权限通过高优先级 `PermissionHook` 接入 `before_tool_call`，ToolDefinition 不再保存权限字段。
@@ -53,21 +53,21 @@ references/MiniCode-Python
 参考规则：
 
 - 只读学习，不复制源码。
-- 每章只吸收一个概念，重写成适合当前 MiniCode 的小版本。
+- 每章只吸收一个概念，重写成适合当前 Micode 的小版本。
 - 每章文档必须写“参考项目学到了什么”。
 
-## 当前 MiniCode 到参考项目的映射
+## 当前 Micode 到参考项目的映射
 
 | 当前模块 | 参考模块 | 学习重点 |
 | --- | --- | --- |
-| `agent.py` | `minicode/agent_loop.py` | Agent loop、任务推进、工具结果处理、错误恢复 |
-| `tools/file.py` | `minicode/tools/edit_file.py`、`modify_file.py`、`patch_file.py` | 结构化编辑、patch、安全修改 |
-| `tools/shell.py` | `minicode/tools/run_command.py`、`test_runner.py` | 命令执行、测试运行、输出摘要 |
-| `tools/registry.py`、`tools/default.py` | `minicode/tools/*`、`tool_registry` 类似组织 | 工具契约、默认工具装配、统一调用 |
-| `hooks/` | `minicode/hooks.py` | 生命周期事件、注册派发、权限和审计扩展点 |
-| `permissions.py` | `minicode/permissions.py`、`safe_execution.py` | 分层权限、危险命令识别、人工确认 |
-| `persistence.py` | `minicode/history.py`、`session.py`、`memory.py` | trace、session、memory 的持久化边界 |
-| `cli.py` | `minicode/main.py`、`cli_commands.py`、`headless.py` | CLI 子命令、headless 入口 |
+| `agent.py` | `micode/agent_loop.py` | Agent loop、任务推进、工具结果处理、错误恢复 |
+| `tools/file.py` | `micode/tools/edit_file.py`、`modify_file.py`、`patch_file.py` | 结构化编辑、patch、安全修改 |
+| `tools/shell.py` | `micode/tools/run_command.py`、`test_runner.py` | 命令执行、测试运行、输出摘要 |
+| `tools/registry.py`、`tools/default.py` | `micode/tools/*`、`tool_registry` 类似组织 | 工具契约、默认工具装配、统一调用 |
+| `hooks/` | `micode/hooks.py` | 生命周期事件、注册派发、权限和审计扩展点 |
+| `permissions.py` | `micode/permissions.py`、`safe_execution.py` | 分层权限、危险命令识别、人工确认 |
+| `persistence.py` | `micode/history.py`、`session.py`、`memory.py` | trace、session、memory 的持久化边界 |
+| `cli.py` | `micode/main.py`、`cli_commands.py`、`headless.py` | CLI 子命令、headless 入口 |
 | `trace.py` | `agent_metrics.py`、`decision_audit.py` | 执行审计、指标与决策记录 |
 
 ## Stage 2 技术主线
@@ -85,9 +85,9 @@ references/MiniCode-Python
 参考：
 
 ```text
-minicode/tooling.py
-minicode/tools/*
-minicode/hooks.py
+micode/tooling.py
+micode/tools/*
+micode/hooks.py
 ```
 
 ### Skill 能力体系
@@ -108,9 +108,9 @@ minicode/hooks.py
 参考：
 
 ```text
-minicode/skills.py
-minicode/skill_routing.py
-minicode/tools/skill.py
+micode/skills.py
+micode/skill_routing.py
+micode/tools/skill.py
 ```
 
 ### 自进化记忆沉淀
@@ -118,19 +118,19 @@ minicode/tools/skill.py
 目标：
 
 - 先建立 Session / Thread Runtime，让多轮会话和事件流成为记忆来源。
-- Session 是多次 Run 的组织容器，当前保存在 `.minicode/sessions/{session_id}.json`。
-- Message History 是从 trace 提取的会话级消息流，当前保存在 `.minicode/sessions/{session_id}.messages.json`。
-- Working Memory 表达当前会话状态，当前保存在 `.minicode/sessions/{session_id}.working_memory.json`。
-- Context Compression 优先用当前模型生成结构化 Session Summary，失败时确定性兜底，结果保存在 `.minicode/sessions/{session_id}.summary.json`。
+- Session 是多次 Run 的组织容器，当前保存在 `.micode/sessions/{session_id}.json`。
+- Message History 是从 trace 提取的会话级消息流，当前保存在 `.micode/sessions/{session_id}.messages.json`。
+- Working Memory 表达当前会话状态，当前保存在 `.micode/sessions/{session_id}.working_memory.json`。
+- Context Compression 优先用当前模型生成结构化 Session Summary，失败时确定性兜底，结果保存在 `.micode/sessions/{session_id}.summary.json`。
 - Agent session 模式会把 Working Memory、Session Summary 和 Recent Messages 合成紧凑上下文注入 prompt。
-- Episodic Memory 从一次 Run / trace 提炼具体经历，当前保存在 `.minicode/memory/episodes.json`。
-- Semantic Memory 从 Episode 提炼稳定事实，当前保存在 `.minicode/memory/semantic.json`。
-- Procedural Memory 从成功 Episode 提炼可复用流程，当前保存在 `.minicode/memory/procedures.json`。
+- Episodic Memory 从一次 Run / trace 提炼具体经历，当前保存在 `.micode/memory/episodes.json`。
+- Semantic Memory 从 Episode 提炼稳定事实，当前保存在 `.micode/memory/semantic.json`。
+- Procedural Memory 从成功 Episode 提炼可复用流程，当前保存在 `.micode/memory/procedures.json`。
 - Procedure 可以转换成 Skill Candidate，但不会自动写入项目 Skill。
 - Procedural Memory 要能和 Skill 体系打通，让成功流程沉淀成可复用能力。
 - Skill Candidate 是 Memory 和 Skill 之间的缓冲层，用于承接“有复用价值但还没稳定到能进入 prompt 的经验”。
-- Skill Candidate 默认保存到 `.minicode/skill-candidates/{candidate_id}.json`，只在人工或 review 流程确认后才提升为 `.minicode/skills/{name}/SKILL.md`。
-- Memory Graph 把 Session、Run、Episode、Semantic Memory 和 Procedural Memory 连成来源图，当前保存在 `.minicode/memory/graph.json`。
+- Skill Candidate 默认保存到 `.micode/skill-candidates/{candidate_id}.json`，只在人工或 review 流程确认后才提升为 `.micode/skills/{name}/SKILL.md`。
+- Memory Graph 把 Session、Run、Episode、Semantic Memory 和 Procedural Memory 连成来源图，当前保存在 `.micode/memory/graph.json`。
 - Entity / Relation Extraction 从 Episode 和 Semantic Memory 中识别规范实体、别名和语义关系，并把来源可追溯的 entity 节点与关系边写入 Memory Graph。
 - Temporal Facts 为关系记录观测时间、有效时间和状态；单值事实按时间与置信度解析为 active、superseded 或 conflicting，多值事实允许并存。
 - Hybrid Retrieval 已组合 keyword、可选 embedding 和 graph traversal；Agent run 前会召回相关长期记忆，默认排除 superseded 事实并标记 conflicting 事实。
@@ -193,23 +193,23 @@ SkillCandidate(
 
 - `memory/skill_candidate.py`：候选数据结构、存储、从 Procedure 生成候选。
 - `skill-candidate-review` CLI：列出候选、显示来源、批准、拒绝、合并建议。
-- `promote_skill_candidate()`：把 approved candidate 写入 `.minicode/skills/{name}/SKILL.md`。
+- `promote_skill_candidate()`：把 approved candidate 写入 `.micode/skills/{name}/SKILL.md`。
 - Memory Review 扩展检查 candidate 是否丢失来源、是否和已有 Skill 冲突。
 
 参考：
 
 ```text
-minicode/memory/session.py
-minicode/memory/working.py
-minicode/memory/context.py
-minicode/memory/episodic.py
-minicode/memory/entity.py
-minicode/memory/graph.py
-minicode/memory/temporal.py
-minicode/memory/retrieval.py
-minicode/memory/ranking.py
-minicode/memory/review.py
-minicode/memory/skill_candidate.py
+micode/memory/session.py
+micode/memory/working.py
+micode/memory/context.py
+micode/memory/episodic.py
+micode/memory/entity.py
+micode/memory/graph.py
+micode/memory/temporal.py
+micode/memory/retrieval.py
+micode/memory/ranking.py
+micode/memory/review.py
+micode/memory/skill_candidate.py
 ```
 
 ### 分层上下文压缩
@@ -218,7 +218,7 @@ minicode/memory/skill_candidate.py
 
 - 通过 Context Layer 管理不同来源的上下文，当前已支持 session 和 long-term memory 两层的优先级、字符预算和截断审计。
 - Tool Result Summary 区分完整 Trace 输出和模型 observation 摘要，并按工具类型保留关键首尾内容。
-- Artifact Placeholder 已将超大完整工具结果外置到 `.minicode/artifacts`，Prompt 和 Trace 只保留摘要、占位符和可验证引用。
+- Artifact Placeholder 已将超大完整工具结果外置到 `.micode/artifacts`，Prompt 和 Trace 只保留摘要、占位符和可验证引用。
 - Runtime Stability 已为 artifact 写入增加内容 hash 幂等性，为 assembled context 增加 prompt cache key，并在每轮模型决策前记录 Decision Freeze。
 - Artifact Read Tool 支持通过 `read_artifact` 按 id/path 安全读回外置结果，并用默认限长预览防止上下文再次膨胀。
 - Token Estimate 已为 Context Layer、assembled context 和每轮 Agent 决策记录稳定的 token 成本估算。
@@ -230,18 +230,18 @@ minicode/memory/skill_candidate.py
 参考：
 
 ```text
-minicode/context_manager.py
-minicode/context_compactor.py
-minicode/layered_context.py
-minicode/tooling.py
-minicode/context/layers.py
-minicode/context/tool_results.py
-minicode/context/artifacts.py
-minicode/context/prompt_cache.py
-minicode/context/decision.py
-minicode/context/tokens.py
-minicode/context/review.py
-minicode/tools/artifact.py
+micode/context_manager.py
+micode/context_compactor.py
+micode/layered_context.py
+micode/tooling.py
+micode/context/layers.py
+micode/context/tool_results.py
+micode/context/artifacts.py
+micode/context/prompt_cache.py
+micode/context/decision.py
+micode/context/tokens.py
+micode/context/review.py
+micode/tools/artifact.py
 ```
 
 ### 中心化多 Agent 协作
@@ -263,12 +263,12 @@ minicode/tools/artifact.py
 参考：
 
 ```text
-minicode/subagents/models.py
-minicode/subagents/tool.py
-minicode/agent_router.py
-minicode/task_object.py
-minicode/task_tracker.py
-minicode/pipeline_engine.py
+micode/subagents/models.py
+micode/subagents/tool.py
+micode/agent_router.py
+micode/task_object.py
+micode/task_tracker.py
+micode/pipeline_engine.py
 ```
 
 ### 权限与安全审查
@@ -284,9 +284,9 @@ minicode/pipeline_engine.py
 参考：
 
 ```text
-minicode/permissions.py
-minicode/safe_execution.py
-minicode/file_review.py
+micode/permissions.py
+micode/safe_execution.py
+micode/file_review.py
 ```
 
 ### MCP
@@ -303,7 +303,7 @@ MCP 放在 Tool Registry、Permission、Context 基础稳定之后接入。
 参考：
 
 ```text
-minicode/mcp.py
+micode/mcp.py
 ```
 
 ## Stage 2 文档

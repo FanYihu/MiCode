@@ -40,7 +40,7 @@ config.toml
   -> load_config()
   -> OpenAICompatibleTextClient(config)
   -> TextLLM(client)
-  -> MiniCodeAgent
+  -> MicodeAgent
 ```
 
 Agent 仍然不关心模型供应商。
@@ -56,7 +56,7 @@ llm.next_action(task, observations)
 建议在项目根目录创建：
 
 ```text
-minicode/config.toml
+micode/config.toml
 ```
 
 内容：
@@ -186,7 +186,7 @@ def create_llm_from_config(path: str = "config.toml") -> TextLLM:
 config.toml 决定 provider/model/base_url/key
 OpenAICompatibleTextClient 负责真实请求
 TextLLM 负责 prompt -> text -> AgentAction
-MiniCodeAgent 负责执行 action
+MicodeAgent 负责执行 action
 ```
 
 ## 后续升级：原生 Tool Calls
@@ -348,7 +348,7 @@ execution_mode
 
 ### Python 线程池实现
 
-MiniCode 的并行组通过 `concurrent.futures.ThreadPoolExecutor` 执行。
+Micode 的并行组通过 `concurrent.futures.ThreadPoolExecutor` 执行。
 
 需要记住：
 
@@ -390,7 +390,7 @@ with ThreadPoolExecutor(max_workers=len(indexed_actions)) as executor:
 
 `submit()` 连续提交任务后，多个 Worker 可以同时执行工具。主线程随后调用 `future.result()` 等待结果；等待某个 Future 时，其他工作线程仍在运行。
 
-完整线程、GIL、Future、异常传播和 MiniCode 代码映射见：
+完整线程、GIL、Future、异常传播和 Micode 代码映射见：
 
 ```text
 笔记/python多线程与线程池.md
@@ -401,7 +401,7 @@ with ThreadPoolExecutor(max_workers=len(indexed_actions)) as executor:
 建议改：
 
 ```text
-minicode/src/minicode/agent.py
+micode/src/micode/agent.py
 ```
 
 新增：
@@ -414,7 +414,7 @@ minicode/src/minicode/agent.py
 建议创建：
 
 ```text
-minicode/config.toml
+micode/config.toml
 ```
 
 但不要在里面写真实 key。
@@ -424,7 +424,7 @@ minicode/config.toml
 新增：
 
 ```text
-minicode/tests/test_llm_config.py
+micode/tests/test_llm_config.py
 ```
 
 建议测试：
@@ -475,13 +475,13 @@ api_key = "test-key"
 1. 只有一个通用的 OpenAI-compatible client。
 2. `provider / model / base_url / api_key` 来自 `config.toml`。
 3. 源码里不写真实 API key。
-4. `MiniCodeAgent` 不读取配置。
+4. `MicodeAgent` 不读取配置。
 5. 全量测试通过。
 
 ## 完成后运行
 
 ```bash
-cd /Users/fanyihu/Desktop/技能学习/minicode
+cd /Users/fanyihu/Desktop/技能学习/micode
 PYTHONPATH=src python3 -m pytest
 ```
 

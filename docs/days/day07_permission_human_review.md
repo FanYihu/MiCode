@@ -2,7 +2,7 @@
 
 ## 今日目标
 
-实现最小版权限审核，让 MiniCode 在高风险操作前能判断是否需要人工确认。
+实现最小版权限审核，让 Micode 在高风险操作前能判断是否需要人工确认。
 
 前面已经有：
 
@@ -34,9 +34,9 @@ Human-in-the-loop 的核心不是“问用户一句话”，而是 Runtime 能�
 ## 你要创建的文件
 
 ```text
-minicode/
+micode/
   src/
-    minicode/
+    micode/
       permissions.py
   tests/
     test_permissions.py
@@ -131,7 +131,7 @@ def review_shell_command(self, command: str) -> PermissionResult:
 ## 完成后运行
 
 ```bash
-cd /Users/fanyihu/Desktop/技能学习/minicode
+cd /Users/fanyihu/Desktop/技能学习/micode
 PYTHONPATH=src python3 -m pytest
 ```
 

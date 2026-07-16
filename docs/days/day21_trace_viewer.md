@@ -7,7 +7,7 @@
 Day 20 已经能保存 trace：
 
 ```text
-.minicode/traces/2026-06-02T12-30-00Z.json
+.micode/traces/2026-06-02T12-30-00Z.json
 ```
 
 Day 21 要做的是：
@@ -37,7 +37,7 @@ Trace Viewer 不改变 Agent 行为，只负责读 trace 和总结 trace。
 建议继续放在：
 
 ```text
-minicode/src/minicode/persistence.py
+micode/src/micode/persistence.py
 ```
 
 新增：
@@ -92,7 +92,7 @@ Errors:
 新增一个子命令：
 
 ```bash
-python3 -m minicode.cli trace path/to/trace.json
+python3 -m micode.cli trace path/to/trace.json
 ```
 
 输出摘要文本，而不是 JSON。
@@ -100,7 +100,7 @@ python3 -m minicode.cli trace path/to/trace.json
 示例：
 
 ```bash
-python3 -m minicode.cli trace .minicode/traces/2026-06-02T12-30-00Z.json
+python3 -m micode.cli trace .micode/traces/2026-06-02T12-30-00Z.json
 ```
 
 ## 你要手写的内容
@@ -108,15 +108,15 @@ python3 -m minicode.cli trace .minicode/traces/2026-06-02T12-30-00Z.json
 修改：
 
 ```text
-minicode/src/minicode/persistence.py
-minicode/src/minicode/cli.py
+micode/src/micode/persistence.py
+micode/src/micode/cli.py
 ```
 
 新增或修改测试：
 
 ```text
-minicode/tests/test_persistence.py
-minicode/tests/test_cli.py
+micode/tests/test_persistence.py
+micode/tests/test_cli.py
 ```
 
 ## 建议测试
@@ -140,7 +140,7 @@ minicode/tests/test_cli.py
 ## 完成后运行
 
 ```bash
-cd /Users/fanyihu/Desktop/技能学习/minicode
+cd /Users/fanyihu/Desktop/技能学习/micode
 PYTHONPATH=src python3 -m pytest
 ```
 

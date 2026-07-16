@@ -85,8 +85,8 @@ SkillRoutingProfile(name, description, tags, when_to_use, when_not_to_use, examp
 - 新增 `TwoStageSkillRouter`，接收带 `generate(prompt)` 的 client，完成“意图识别 -> 候选召回 -> 精排”。
 - `LLMSkillRouter` 保留为兼容旧名称，当前实现指向二阶段 Router。
 - 新增 `route_skills_with_llm()`，先走确定性策略，必要时调用 `LLMSkillRouter`。
-- `MiniCodeAgent` 支持注入 `skills` 和 `skill_router`，在 Agent loop 前完成 Skill 选择，并把选中 Summary 注入 action prompt。
-- CLI `agent` 入口会扫描项目级 `.minicode/skills` 和用户级 `~/.minicode/skills`，并用当前 LLM 的 `client.generate(prompt)` 作为外部 Skill Router client。
+- `MicodeAgent` 支持注入 `skills` 和 `skill_router`，在 Agent loop 前完成 Skill 选择，并把选中 Summary 注入 action prompt。
+- CLI `agent` 入口会扫描项目级 `.micode/skills` 和用户级 `~/.micode/skills`，并用当前 LLM 的 `client.generate(prompt)` 作为外部 Skill Router client。
 - 补充测试覆盖小规模全量返回、显式点名、任务意图解析、When 边界解析、examples 读取、Router JSON 解析、按名称选择、Router client 调用、Agent 注入、CLI 入口集成、项目优先合并和外部 Skill 加载。
 
 ## 思考题

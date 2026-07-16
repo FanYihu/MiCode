@@ -52,7 +52,7 @@ SessionSummary(
 
 ## 怎么做
 
-- Summary 保存为 `.minicode/sessions/{session_id}.summary.json`。
+- Summary 保存为 `.micode/sessions/{session_id}.summary.json`。
 - Message History 原文件不删除。
 - 默认保留最近 8 条消息原文，较早消息进入 summary。
 - 当前优先复用配置模型生成结构化摘要，字段包括 overview、goals、decisions、completed、errors、constraints 和 next_steps。

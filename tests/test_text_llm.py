@@ -1,6 +1,6 @@
 import pytest
 
-from minicode.agent import AgentAction, InvalidActionText, TextLLM
+from micode.agent import AgentAction, InvalidActionText, TextLLM
 
 
 class FakeTextClient:
@@ -81,7 +81,7 @@ def test_text_llm_prefers_native_generate_action():
 
 
 def test_text_llm_keeps_native_assistant_and_tool_messages():
-    from minicode.agent import ModelToolCall, ModelTurn
+    from micode.agent import ModelToolCall, ModelTurn
 
     class CompleteClient:
         def __init__(self):
@@ -145,7 +145,7 @@ def test_text_llm_keeps_native_assistant_and_tool_messages():
 
 
 def test_text_llm_falls_back_when_native_tools_are_disabled():
-    from minicode.agent import ProviderCapabilities
+    from micode.agent import ProviderCapabilities
 
     class CompatibleClient:
         capabilities = ProviderCapabilities(native_tools=False)
@@ -164,7 +164,7 @@ def test_text_llm_falls_back_when_native_tools_are_disabled():
 
 
 def test_text_llm_next_turn_returns_multiple_native_tool_calls():
-    from minicode.agent import ModelToolCall, ModelTurn
+    from micode.agent import ModelToolCall, ModelTurn
 
     class CompleteClient:
         def complete(self, messages, tools):

@@ -1,4 +1,4 @@
-from minicode.permissions import (
+from micode.permissions import (
     PermissionDecision,
     PermissionReviewer,
     PermissionRule,

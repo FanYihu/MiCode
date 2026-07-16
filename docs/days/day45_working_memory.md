@@ -45,7 +45,7 @@ WorkingMemory(
 
 ## 怎么做
 
-- Working Memory 保存为 `.minicode/sessions/{session_id}.working_memory.json`。
+- Working Memory 保存为 `.micode/sessions/{session_id}.working_memory.json`。
 - CLI agent 在 session 模式下，先写入 Message History，再用本次新增消息更新 Working Memory。
 - 当前实现先用确定性规则：
   - `user` 消息更新 `current_goal`。

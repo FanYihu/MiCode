@@ -18,7 +18,7 @@ Memory Graph 的作用是把这些记忆连起来，让系统知道：
 - `MemoryNode`：表示 session、run、episode、semantic、procedure 等节点。
 - `MemoryEdge`：表示 `derived_from_episode`、`records_run`、`belongs_to_session` 等关系。
 - `MemoryGraph`：在内存中管理节点和边，并按 id 去重。
-- `MemoryGraphStore`：把图保存到 `.minicode/memory/graph.json`。
+- `MemoryGraphStore`：把图保存到 `.micode/memory/graph.json`。
 - CLI session 模式每次 run 结束后自动更新 graph。
 
 ## 怎么做
@@ -31,7 +31,7 @@ Trace
   -> SemanticMemory / ProceduralMemory
   -> build_memory_graph(...)
   -> MemoryGraphStore.upsert_graph(...)
-  -> .minicode/memory/graph.json
+  -> .micode/memory/graph.json
 ```
 
 当前 Day50 只做“来源图”和“索引结构”，不急着做复杂知识图谱：
@@ -45,7 +45,7 @@ Trace
 
 参考项目里长期记忆不是孤立字符串，而是要能追溯来源、支持后续检索和复盘。
 
-MiniCode 这一章没有照搬复杂存储，只实现一个本地 JSON 图索引，为后续 graph traversal 和 hybrid retrieval 留接口。
+Micode 这一章没有照搬复杂存储，只实现一个本地 JSON 图索引，为后续 graph traversal 和 hybrid retrieval 留接口。
 
 ## 验收标准
 
@@ -60,4 +60,4 @@ MiniCode 这一章没有照搬复杂存储，只实现一个本地 JSON 图索�
 
 新增 `memory/graph.py`，实现 MemoryNode、MemoryEdge、MemoryGraph、MemoryGraphStore 和 build_memory_graph。
 
-CLI 在 session 模式下完成 episodic、semantic、procedural memory 后，会自动更新 `.minicode/memory/graph.json`，把长期记忆之间的来源关系保存下来。
+CLI 在 session 模式下完成 episodic、semantic、procedural memory 后，会自动更新 `.micode/memory/graph.json`，把长期记忆之间的来源关系保存下来。

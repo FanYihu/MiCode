@@ -36,9 +36,9 @@ AgentAction(read_artifact)
 
 ## 做了什么
 
-- 新增 `minicode/tools/artifact.py`，实现 `read_artifact`。
+- 新增 `micode/tools/artifact.py`，实现 `read_artifact`。
 - 默认工具集合注册 `read_artifact`。
-- `MiniCodeAgent` 创建默认工具集合时传入当前 `artifact_dir`。
+- `MicodeAgent` 创建默认工具集合时传入当前 `artifact_dir`。
 - 增加 artifact 读取、边界保护、hash mismatch、默认 Agent 调用读取的测试。
 
 ## 学习重点

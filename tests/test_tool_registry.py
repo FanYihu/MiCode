@@ -1,15 +1,15 @@
 import pytest
 import subprocess
 
-from minicode.skills import Skill
-from minicode.tools.default import create_default_tool_registry
-from minicode.tools.registry import (
+from micode.skills import Skill
+from micode.tools.default import create_default_tool_registry
+from micode.tools.registry import (
     DuplicateToolName,
     ToolDefinition,
     ToolRegistry,
     ToolResult,
 )
-from minicode.workspace import Workspace
+from micode.workspace import Workspace
 
 
 def test_tool_registry_registers_and_finds_tool():
@@ -213,7 +213,7 @@ def test_default_tool_registry_registers_git_tools(tmp_path):
 
 
 def test_default_tool_registry_loads_project_skill(tmp_path):
-    skill_dir = tmp_path / ".minicode" / "skills" / "python-test"
+    skill_dir = tmp_path / ".micode" / "skills" / "python-test"
     skill_dir.mkdir(parents=True)
     (skill_dir / "SKILL.md").write_text(
         "# Python Test\n\nRun Python tests safely.\n\nUse pytest.",
@@ -255,7 +255,7 @@ def test_default_tool_registry_loads_external_skill(tmp_path):
 
 
 def test_default_tool_registry_prefers_project_skill_over_external_skill(tmp_path):
-    skill_dir = tmp_path / ".minicode" / "skills" / "python-test"
+    skill_dir = tmp_path / ".micode" / "skills" / "python-test"
     skill_dir.mkdir(parents=True)
     (skill_dir / "SKILL.md").write_text(
         "# Python Test\n\nProject flow.\n\nUse project pytest.",

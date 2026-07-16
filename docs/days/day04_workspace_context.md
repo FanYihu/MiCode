@@ -2,7 +2,7 @@
 
 ## 今日目标
 
-实现一个最小版 `Workspace`，让 MiniCode 能读取本地代码工程的上下文。
+实现一个最小版 `Workspace`，让 Micode 能读取本地代码工程的上下文。
 
 前面三章做的是 Runtime 内核：
 
@@ -26,9 +26,9 @@ Coding Agent 在动手前必须先观察：
 ## 你要创建的文件
 
 ```text
-minicode/
+micode/
   src/
-    minicode/
+    micode/
       workspace.py
   tests/
     test_workspace.py
@@ -121,7 +121,7 @@ def search_text(self, keyword: str) -> list[dict]:
     {
         "path": "README.md",
         "line": 3,
-        "text": "hello minicode",
+        "text": "hello micode",
     }
 ]
 ```
@@ -167,7 +167,7 @@ def test_read_text_reads_file_content(tmp_path):
 ## 完成后运行
 
 ```bash
-cd /Users/fanyihu/Desktop/技能学习/minicode
+cd /Users/fanyihu/Desktop/技能学习/micode
 PYTHONPATH=src python3 -m pytest
 ```
 

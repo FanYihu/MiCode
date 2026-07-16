@@ -1,4 +1,4 @@
-from minicode.context.tokens import estimate_text, estimate_text_parts, estimate_tokens
+from micode.context.tokens import estimate_text, estimate_text_parts, estimate_tokens
 
 
 def test_estimate_tokens_uses_ceil_chars_per_token():

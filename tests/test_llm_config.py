@@ -1,7 +1,7 @@
 import sys
 from types import SimpleNamespace
 
-from minicode.agent import (
+from micode.agent import (
     LLMConfig,
     LLMError,
     OpenAICompatibleTextClient,
@@ -81,7 +81,7 @@ api_key = "test-key"
         def __init__(self, config):
             self.config = config
 
-    monkeypatch.setattr("minicode.agent.OpenAICompatibleTextClient", DummyClient)
+    monkeypatch.setattr("micode.agent.OpenAICompatibleTextClient", DummyClient)
 
     llm = create_llm_from_config(str(config_path))
 

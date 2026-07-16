@@ -42,9 +42,9 @@ Day55 的目标是给记忆系统加一个可执行体检，而不是只写复�
 新增 CLI：
 
 ```bash
-minicode memory-review \
-  --session-dir .minicode/sessions \
-  --memory-dir .minicode/memory \
+micode memory-review \
+  --session-dir .micode/sessions \
+  --memory-dir .micode/memory \
   --sample-query "pytest"
 ```
 
@@ -73,7 +73,7 @@ minicode memory-review \
 
 - 是否有清晰的 `name`、`description`、`content`、`tags`。
 - `content` 是否是可复用流程，而不是某次 trace 的流水账。
-- 是否和已有 `.minicode/skills` 或用户级 Skill 同名。
+- 是否和已有 `.micode/skills` 或用户级 Skill 同名。
 - 是否有足够来源支撑，避免单次偶然成功被误提升。
 - `review_notes` 是否说明批准、拒绝或合并原因。
 
@@ -138,7 +138,7 @@ HybridMemoryRetriever.retrieve(...)
 
 ## 参考项目学到了什么
 
-参考项目强调 Agent 过程必须可审计。MiniCode 把这个原则扩展到记忆系统：每一层记忆不仅要能写入，还要能被检查、追溯和解释。
+参考项目强调 Agent 过程必须可审计。Micode 把这个原则扩展到记忆系统：每一层记忆不仅要能写入，还要能被检查、追溯和解释。
 
 ## 验收标准
 

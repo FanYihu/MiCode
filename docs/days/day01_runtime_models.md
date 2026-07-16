@@ -2,7 +2,7 @@
 
 ## 今日目标
 
-手写 MiniCode 的三个核心对象：
+手写 Micode 的三个核心对象：
 
 - `Run`：一次用户任务
 - `Step`：任务执行过程中的一个步骤
@@ -13,9 +13,9 @@
 ## 你要创建的文件
 
 ```text
-minicode/
+micode/
   src/
-    minicode/
+    micode/
       __init__.py
       models.py
   tests/
@@ -66,6 +66,6 @@ minicode/
 ## 完成后运行
 
 ```bash
-cd /Users/fanyihu/Desktop/技能学习/minicode
+cd /Users/fanyihu/Desktop/技能学习/micode
 python -m pytest
 ```

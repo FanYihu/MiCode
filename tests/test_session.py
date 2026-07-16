@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from minicode.memory.session import (
+from micode.memory.session import (
     Session,
     SessionMessage,
     SessionMessageStore,
@@ -10,8 +10,8 @@ from minicode.memory.session import (
     messages_from_trace,
     role_for_event_type,
 )
-from minicode.memory.context import SessionSummary, SessionSummaryStore
-from minicode.memory.working import WorkingMemoryStore
+from micode.memory.context import SessionSummary, SessionSummaryStore
+from micode.memory.working import WorkingMemoryStore
 
 
 def test_session_has_default_identity_and_metadata():
@@ -46,7 +46,7 @@ def test_session_add_run_rejects_empty_run_id():
 def test_session_round_trip_dict_preserves_fields():
     session = Session(
         id="session-1",
-        title="MiniCode 学习",
+        title="Micode 学习",
         run_ids=["run-1"],
         metadata={"workspace": "."},
     )
@@ -54,7 +54,7 @@ def test_session_round_trip_dict_preserves_fields():
     loaded = Session.from_dict(session.to_dict())
 
     assert loaded.id == "session-1"
-    assert loaded.title == "MiniCode 学习"
+    assert loaded.title == "Micode 学习"
     assert loaded.run_ids == ["run-1"]
     assert loaded.metadata == {"workspace": "."}
 

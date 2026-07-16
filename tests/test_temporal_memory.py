@@ -1,5 +1,5 @@
-from minicode.memory.graph import MemoryGraph, MemoryGraphStore, make_edge
-from minicode.memory.temporal import (
+from micode.memory.graph import MemoryGraph, MemoryGraphStore, make_edge
+from micode.memory.temporal import (
     ACTIVE,
     CONFLICTING,
     SUPERSEDED,
@@ -15,7 +15,7 @@ def temporal_edge(
     cardinality: str = "single",
 ):
     return make_edge(
-        "entity:minicode",
+        "entity:micode",
         target_id,
         "uses_model",
         properties={

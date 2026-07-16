@@ -1,7 +1,7 @@
 import json
 
-from minicode.context.decision import freeze_decision
-from minicode.context.prompt_cache import PromptCacheStore
+from micode.context.decision import freeze_decision
+from micode.context.prompt_cache import PromptCacheStore
 
 
 def test_prompt_cache_store_writes_same_context_idempotently(tmp_path):

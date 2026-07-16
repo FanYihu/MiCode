@@ -4,7 +4,7 @@
 
 把 Agent Loop 里的“下一步动作从哪里来”单独抽出来。
 
-前面 Day 09 里，`MiniCodeAgent` 只关心一件事：
+前面 Day 09 里，`MicodeAgent` 只关心一件事：
 
 ```text
 拿到 AgentAction -> 执行工具 -> 记录 observation -> 再拿下一个 AgentAction
@@ -20,12 +20,12 @@
 
 ## 为什么先做这一层
 
-如果直接把真实 LLM 调用写进 `MiniCodeAgent`，Agent 会变得很难测试。
+如果直接把真实 LLM 调用写进 `MicodeAgent`，Agent 会变得很难测试。
 
 更好的结构是：
 
 ```text
-MiniCodeAgent
+MicodeAgent
   -> action_provider.next_action(task, observations)
   -> AgentAction
 ```
@@ -56,7 +56,7 @@ def next_action(self, task: str, observations: list[str]) -> AgentAction:
     ...
 ```
 
-只要实现这个方法，就可以被 `MiniCodeAgent` 使用。
+只要实现这个方法，就可以被 `MicodeAgent` 使用。
 
 ## 你要理解的关系
 
@@ -64,7 +64,7 @@ def next_action(self, task: str, observations: list[str]) -> AgentAction:
 用户任务
   |
   v
-MiniCodeAgent.run(task)
+MicodeAgent.run(task)
   |
   v
 ActionProvider.next_action(task, observations)
@@ -76,7 +76,7 @@ AgentAction
 调用工具 / 最终回答
 ```
 
-注意：`MiniCodeAgent` 不需要知道 provider 里面是固定列表、规则判断，还是 LLM API。
+注意：`MicodeAgent` 不需要知道 provider 里面是固定列表、规则判断，还是 LLM API。
 
 ## 本章建议改造
 
@@ -131,7 +131,7 @@ Day 11 先把接口稳定下来，下一章再做 action schema 校验。
 这章建议只改一个文件：
 
 ```text
-minicode/src/minicode/agent.py
+micode/src/micode/agent.py
 ```
 
 改 `MockLLM.next_action()`，让它按顺序返回预设 actions。
@@ -144,25 +144,25 @@ minicode/src/minicode/agent.py
 1. MockLLM 第一次返回第一个 action
 2. MockLLM 第二次返回第二个 action
 3. actions 用完后返回 final action
-4. MiniCodeAgent 可以直接使用 MockLLM 完成 read_file -> final
+4. MicodeAgent 可以直接使用 MockLLM 完成 read_file -> final
 ```
 
 ## 验收标准
 
 1. `MockLLM` 不再返回空 action。
-2. `MockLLM` 可以驱动 `MiniCodeAgent` 正常执行。
+2. `MockLLM` 可以驱动 `MicodeAgent` 正常执行。
 3. action 用完后，Agent 能自然结束。
 4. 不修改 Tools、Trace、Permission 的结构。
 
 ## 完成后运行
 
 ```bash
-cd /Users/fanyihu/Desktop/技能学习/minicode
+cd /Users/fanyihu/Desktop/技能学习/micode
 PYTHONPATH=src python3 -m pytest
 ```
 
 ## 思考题
 
-为什么 `MiniCodeAgent` 不应该直接依赖真实 LLM API？
+为什么 `MicodeAgent` 不应该直接依赖真实 LLM API？
 
 提示：如果 Agent 只依赖 `next_action()`，测试和真实模型就可以共用同一套执行循环。

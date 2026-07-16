@@ -1,6 +1,6 @@
-from minicode.agent import AgentAction, MiniCodeAgent
-from minicode.models import RunStatus
-from minicode.subagents import (
+from micode.agent import AgentAction, MicodeAgent
+from micode.models import RunStatus
+from micode.subagents import (
     ForkedSubAgentExecutor,
     ImplementerSubAgent,
     MultiAgentReviewPipeline,
@@ -13,11 +13,11 @@ from minicode.subagents import (
     create_default_subagent_executor,
     create_subagent_tool,
 )
-from minicode.tools.file import FileTools
-from minicode.tools.shell import ShellTools
-from minicode.tools.default import create_default_tool_registry
-from minicode.tools.registry import ToolRegistry
-from minicode.workspace import Workspace
+from micode.tools.file import FileTools
+from micode.tools.shell import ShellTools
+from micode.tools.default import create_default_tool_registry
+from micode.tools.registry import ToolRegistry
+from micode.workspace import Workspace
 
 
 class RecordingExecutor:
@@ -182,7 +182,7 @@ def test_agent_delegates_subtask_through_default_tool_registry(tmp_path):
             )
 
     llm = DelegatingLLM()
-    trace = MiniCodeAgent(
+    trace = MicodeAgent(
         Workspace(str(tmp_path)),
         llm,
         subagent_executor=executor,

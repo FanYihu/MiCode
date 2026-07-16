@@ -54,10 +54,10 @@ command: python3 -m pytest tests/test_subagents.py -q
 
 ## 做了什么
 
-- 新增 `minicode/subagents/tester.py`。
+- 新增 `micode/subagents/tester.py`。
 - 新增 `TesterSubAgent` 和默认测试命令。
 - `create_default_subagent_executor(workspace)` 支持注册 tester。
-- `minicode/subagents/__init__.py` 暴露 `TesterSubAgent`。
+- `micode/subagents/__init__.py` 暴露 `TesterSubAgent`。
 - 补充 tester 成功、失败、危险命令拦截、shell 拼接拦截和 ToolRegistry metadata 测试。
 
 ## 学习重点

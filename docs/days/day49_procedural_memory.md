@@ -76,8 +76,8 @@ SkillCandidate(
 
 ## 怎么做
 
-- Procedure 保存为 `.minicode/memory/procedures.json`。
-- Skill Candidate 保存为 `.minicode/skill-candidates/{candidate_id}.json`。
+- Procedure 保存为 `.micode/memory/procedures.json`。
+- Skill Candidate 保存为 `.micode/skill-candidates/{candidate_id}.json`。
 - 只有成功 episode 才会提炼 procedure。
 - `procedural_memories_from_episode()` 优先调用当前 LLM client 抽取可复用步骤。
 - LLM 失败或返回空时，用确定性兜底。
@@ -91,7 +91,7 @@ SkillCandidate(
 - Candidate 的 `content` 应该写成可执行流程，而不是复述某次 trace。
 - Candidate 不允许默认进入 `format_skill_summaries_for_prompt()`。
 - Candidate 不允许被 `load_skill` 当成正式 Skill 加载。
-- Candidate 提升为 Skill 时，才写入 `.minicode/skills/{name}/SKILL.md`。
+- Candidate 提升为 Skill 时，才写入 `.micode/skills/{name}/SKILL.md`。
 
 推荐提升流程：
 
@@ -101,7 +101,7 @@ ProceduralMemory
   -> skill-candidate-review
   -> approved
   -> promote_skill_candidate()
-  -> .minicode/skills/{name}/SKILL.md
+  -> .micode/skills/{name}/SKILL.md
   -> Skill Loader / Router / load_skill
 ```
 
@@ -113,7 +113,7 @@ ProceduralMemory
 4. LLM 失败时能回退到确定性提炼。
 5. Procedure 可以转换成 Skill Candidate，且不破坏 Skill 四字段契约。
 6. ProceduralMemoryStore 可以保存、upsert、search。
-7. CLI session run 会写入 `.minicode/memory/procedures.json`。
+7. CLI session run 会写入 `.micode/memory/procedures.json`。
 8. Candidate 不会自动进入正式 Skill Loader。
 9. Candidate 提升为 Skill 前必须经过 review 状态。
 10. 全量测试通过。

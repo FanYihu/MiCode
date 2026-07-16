@@ -1,12 +1,20 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "minicode"
+name = "micode"
 version = "0.1.0"
 description = "A learning project for building a small coding agent runtime."
+readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
     "openai",
     "tomli; python_version < '3.11'",
 ]
+
+[project.scripts]
+micode = "micode.cli:main"
 
 [project.optional-dependencies]
 test = [
@@ -15,3 +23,6 @@ test = [
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

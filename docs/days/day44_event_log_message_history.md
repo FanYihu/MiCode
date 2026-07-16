@@ -55,8 +55,8 @@ SessionMessage(
 
 ## 怎么做
 
-- Session 索引仍保存在 `.minicode/sessions/{session_id}.json`。
-- Message History 保存在 `.minicode/sessions/{session_id}.messages.json`。
+- Session 索引仍保存在 `.micode/sessions/{session_id}.json`。
+- Message History 保存在 `.micode/sessions/{session_id}.messages.json`。
 - CLI agent 在传入 `--session-id` 时，同时更新 Session 和 Message History。
 - trace metadata 记录 `session_messages_path`，方便复盘定位。
 

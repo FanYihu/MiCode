@@ -7,8 +7,8 @@
 前面的 CLI 只支持固定任务：
 
 ```bash
-python3 -m minicode.cli "list files" --workspace .
-python3 -m minicode.cli "run tests" --workspace .
+python3 -m micode.cli "list files" --workspace .
+python3 -m micode.cli "run tests" --workspace .
 ```
 
 这类逻辑是程序员写死的分支。
@@ -16,7 +16,7 @@ python3 -m minicode.cli "run tests" --workspace .
 Day 18 要新增一个 agent 模式：
 
 ```bash
-python3 -m minicode.cli agent "读取 README 并总结" --workspace . --config config.toml
+python3 -m micode.cli agent "读取 README 并总结" --workspace . --config config.toml
 ```
 
 这时流程变成：
@@ -25,7 +25,7 @@ python3 -m minicode.cli agent "读取 README 并总结" --workspace . --config c
 CLI
   -> Workspace
   -> create_llm_from_config(config.toml)
-  -> MiniCodeAgent
+  -> MicodeAgent
   -> trace JSON
 ```
 
@@ -33,7 +33,7 @@ CLI
 
 现在你的项目已经有：
 
-- `MiniCodeAgent`
+- `MicodeAgent`
 - `TextLLM`
 - `OpenAICompatibleTextClient`
 - `config.toml`
@@ -48,9 +48,9 @@ CLI Agent Mode 的价值是：你可以在终端里用真实模型跑一次完�
 为了不破坏旧命令，建议新增子命令：
 
 ```bash
-python3 -m minicode.cli fixed "list files" --workspace .
-python3 -m minicode.cli fixed "run tests" --workspace .
-python3 -m minicode.cli agent "读取 README 并总结" --workspace . --config config.toml
+python3 -m micode.cli fixed "list files" --workspace .
+python3 -m micode.cli fixed "run tests" --workspace .
+python3 -m micode.cli agent "读取 README 并总结" --workspace . --config config.toml
 ```
 
 旧的 `run_task()` 可以先保留。
@@ -64,13 +64,13 @@ python3 -m minicode.cli agent "读取 README 并总结" --workspace . --config c
 建议在 `cli.py` 里新增：
 
 ```python
-from minicode.agent import MiniCodeAgent, create_llm_from_config
+from micode.agent import MicodeAgent, create_llm_from_config
 
 
 def run_agent_task(task: str, workspace_path: str, config_path: str) -> dict:
     workspace = Workspace(workspace_path)
     llm = create_llm_from_config(config_path)
-    agent = MiniCodeAgent(workspace, llm)
+    agent = MicodeAgent(workspace, llm)
     return agent.run(task)
 ```
 
@@ -83,7 +83,7 @@ def run_agent_task(task: str, workspace_path: str, config_path: str) -> dict:
 建议用 subparser：
 
 ```python
-parser = argparse.ArgumentParser(description="MiniCode CLI")
+parser = argparse.ArgumentParser(description="Micode CLI")
 subparsers = parser.add_subparsers(dest="mode", required=True)
 
 fixed_parser = subparsers.add_parser("fixed")
@@ -116,7 +116,7 @@ print(json.dumps(trace, ensure_ascii=False, indent=2))
 如果你想保留旧用法：
 
 ```bash
-python3 -m minicode.cli "list files" --workspace .
+python3 -m micode.cli "list files" --workspace .
 ```
 
 可以先不强制上 subparser。
@@ -170,7 +170,7 @@ class SequenceLLM:
 测试里：
 
 ```python
-monkeypatch.setattr("minicode.cli.create_llm_from_config", lambda path: SequenceLLM())
+monkeypatch.setattr("micode.cli.create_llm_from_config", lambda path: SequenceLLM())
 ```
 
 这样可以验证 CLI Agent Mode 的连接逻辑，不会访问真实 API。
@@ -180,7 +180,7 @@ monkeypatch.setattr("minicode.cli.create_llm_from_config", lambda path: Sequence
 建议改：
 
 ```text
-minicode/src/minicode/cli.py
+micode/src/micode/cli.py
 ```
 
 新增：
@@ -192,7 +192,7 @@ minicode/src/minicode/cli.py
 建议改：
 
 ```text
-minicode/tests/test_cli.py
+micode/tests/test_cli.py
 ```
 
 新增 agent mode 测试。
@@ -208,7 +208,7 @@ minicode/tests/test_cli.py
 ## 完成后运行
 
 ```bash
-cd /Users/fanyihu/Desktop/技能学习/minicode
+cd /Users/fanyihu/Desktop/技能学习/micode
 PYTHONPATH=src python3 -m pytest
 ```
 
@@ -223,8 +223,8 @@ export MIMO_API_KEY="your_key_here"
 运行：
 
 ```bash
-cd /Users/fanyihu/Desktop/技能学习/minicode
-PYTHONPATH=src python3 -m minicode.cli agent "列出文件并总结项目结构" --workspace . --config config.toml
+cd /Users/fanyihu/Desktop/技能学习/micode
+PYTHONPATH=src python3 -m micode.cli agent "列出文件并总结项目结构" --workspace . --config config.toml
 ```
 
 ## 思考题

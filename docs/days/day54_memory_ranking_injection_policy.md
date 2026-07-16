@@ -96,7 +96,7 @@ Hybrid Retrieval candidates
 可以调整长期记忆字符预算：
 
 ```bash
-minicode agent "继续任务" --memory-budget-chars 1200
+micode agent "继续任务" --memory-budget-chars 1200
 ```
 
 Trace metadata 新增：
@@ -119,7 +119,7 @@ Trace metadata 新增：
 
 ## 参考项目学到了什么
 
-参考项目把上下文当作有限资源管理。MiniCode 因此把“检索到什么”和“最终注入什么”拆开，让记忆的相关性、可信度、时效性和上下文成本都可以独立审计。
+参考项目把上下文当作有限资源管理。Micode 因此把“检索到什么”和“最终注入什么”拆开，让记忆的相关性、可信度、时效性和上下文成本都可以独立审计。
 
 ## 验收标准
 

@@ -25,9 +25,9 @@ Coding Agent 会执行文件修改、命令运行、人工确认等步骤。如�
 ## 你要修改的文件
 
 ```text
-minicode/
+micode/
   src/
-    minicode/
+    micode/
       models.py
   tests/
     test_models.py
@@ -116,7 +116,7 @@ with pytest.raises(models.InvalidRunStatusTransition):
 ## 完成后运行
 
 ```bash
-cd /Users/fanyihu/Desktop/技能学习/minicode
+cd /Users/fanyihu/Desktop/技能学习/micode
 PYTHONPATH=src python3 -m pytest
 ```
 

@@ -26,7 +26,7 @@ Agent Loop 只应该执行结构化 action，不应该直接执行模型文本�
 {"tool": "read_file", "args": {"path": "README.md"}, "final": false}
 ```
 
-MiniCode 要做的是：
+Micode 要做的是：
 
 1. 用 `json.loads()` 把字符串变成 dict。
 2. 从 dict 里取出 `tool / args / final`。
@@ -140,7 +140,7 @@ parse_action() 返回成功 = 可以交给 Agent Loop 执行
 建议改一个文件：
 
 ```text
-minicode/src/minicode/agent.py
+micode/src/micode/agent.py
 ```
 
 新增：
@@ -154,7 +154,7 @@ minicode/src/minicode/agent.py
 新增测试文件：
 
 ```text
-minicode/tests/test_action_parser.py
+micode/tests/test_action_parser.py
 ```
 
 建议测试：
@@ -177,7 +177,7 @@ minicode/tests/test_action_parser.py
 ## 完成后运行
 
 ```bash
-cd /Users/fanyihu/Desktop/技能学习/minicode
+cd /Users/fanyihu/Desktop/技能学习/micode
 PYTHONPATH=src python3 -m pytest
 ```
 

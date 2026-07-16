@@ -18,7 +18,7 @@ Events: 2
 Day 26 要新增：
 
 ```bash
-python3 -m minicode.cli trace path/to/trace.json --detail
+python3 -m micode.cli trace path/to/trace.json --detail
 ```
 
 详细模式可以展示：
@@ -45,7 +45,7 @@ python3 -m minicode.cli trace path/to/trace.json --detail
 放在：
 
 ```text
-minicode/src/minicode/persistence.py
+micode/src/micode/persistence.py
 ```
 
 新增：
@@ -66,8 +66,8 @@ summarize_trace(trace)
 ## CLI 变化
 
 ```bash
-python3 -m minicode.cli trace trace.json
-python3 -m minicode.cli trace trace.json --detail
+python3 -m micode.cli trace trace.json
+python3 -m micode.cli trace trace.json --detail
 ```
 
 `--detail` 为 False 时继续摘要。
@@ -79,15 +79,15 @@ python3 -m minicode.cli trace trace.json --detail
 修改：
 
 ```text
-minicode/src/minicode/persistence.py
-minicode/src/minicode/cli.py
+micode/src/micode/persistence.py
+micode/src/micode/cli.py
 ```
 
 修改测试：
 
 ```text
-minicode/tests/test_persistence.py
-minicode/tests/test_cli.py
+micode/tests/test_persistence.py
+micode/tests/test_cli.py
 ```
 
 ## 验收标准

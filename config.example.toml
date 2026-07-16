@@ -1,0 +1,11 @@
+[llm]
+provider = "openai-compatible"
+model = "your-model-name"
+base_url = "https://api.example.com/v1"
+api_key = "replace-with-your-api-key"
+
+[llm.capabilities]
+native_tools = true
+parallel_tool_calls = false
+reasoning_content = false
+strict_tool_schema = false

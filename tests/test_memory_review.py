@@ -1,26 +1,26 @@
 import json
 
-from minicode.cli import run_memory_review
-from minicode.memory.context import SessionSummary, SessionSummaryStore
-from minicode.memory.episodic import EpisodicMemory, EpisodicMemoryStore
-from minicode.memory.graph import MemoryGraph, MemoryGraphStore, MemoryNode, make_edge
-from minicode.memory.procedural import ProceduralMemory, ProceduralMemoryStore
-from minicode.memory.review import review_memory_system
-from minicode.memory.semantic import SemanticMemory, SemanticMemoryStore
-from minicode.memory.session import SessionMessage, SessionMessageStore, SessionStore
-from minicode.memory.skill_candidate import (
+from micode.cli import run_memory_review
+from micode.memory.context import SessionSummary, SessionSummaryStore
+from micode.memory.episodic import EpisodicMemory, EpisodicMemoryStore
+from micode.memory.graph import MemoryGraph, MemoryGraphStore, MemoryNode, make_edge
+from micode.memory.procedural import ProceduralMemory, ProceduralMemoryStore
+from micode.memory.review import review_memory_system
+from micode.memory.semantic import SemanticMemory, SemanticMemoryStore
+from micode.memory.session import SessionMessage, SessionMessageStore, SessionStore
+from micode.memory.skill_candidate import (
     APPROVED,
     PROMOTED,
     SkillCandidateStore,
     skill_candidate_from_procedure,
 )
-from minicode.memory.working import WorkingMemory, WorkingMemoryStore
+from micode.memory.working import WorkingMemory, WorkingMemoryStore
 
 
 def seed_healthy_memory(session_dir, memory_dir) -> None:
     session_store = SessionStore(str(session_dir))
     session = session_store.create(
-        title="MiniCode 学习",
+        title="Micode 学习",
         session_id="session-1",
     )
     session.add_run("run-1")
@@ -55,9 +55,9 @@ def seed_healthy_memory(session_dir, memory_dir) -> None:
         tool_names=["run_shell"],
     )
     semantic = SemanticMemory(
-        id="semantic:minicode-uses-pytest",
-        fact="MiniCode uses pytest",
-        subject="MiniCode",
+        id="semantic:micode-uses-pytest",
+        fact="Micode uses pytest",
+        subject="Micode",
         predicate="uses",
         object="pytest",
         confidence=0.9,
@@ -89,7 +89,7 @@ def seed_healthy_memory(session_dir, memory_dir) -> None:
             MemoryNode(id=episode.id, type="episode", label=episode.task),
             MemoryNode(id=semantic.id, type="semantic", label=semantic.fact),
             MemoryNode(id=procedure.id, type="procedure", label=procedure.name),
-            MemoryNode(id="entity:minicode", type="entity", label="MiniCode"),
+            MemoryNode(id="entity:micode", type="entity", label="Micode"),
             MemoryNode(id="entity:pytest", type="entity", label="pytest"),
         ],
         edges=[
@@ -98,7 +98,7 @@ def seed_healthy_memory(session_dir, memory_dir) -> None:
             make_edge(semantic.id, episode.id, "derived_from_episode"),
             make_edge(procedure.id, episode.id, "derived_from_episode"),
             make_edge(
-                "entity:minicode",
+                "entity:micode",
                 "entity:pytest",
                 "uses",
                 properties={
@@ -109,7 +109,7 @@ def seed_healthy_memory(session_dir, memory_dir) -> None:
                     "source_episode_ids": [episode.id],
                 },
             ),
-            make_edge("entity:minicode", semantic.id, "supported_by_memory"),
+            make_edge("entity:micode", semantic.id, "supported_by_memory"),
             make_edge("entity:pytest", semantic.id, "supported_by_memory"),
         ],
     )

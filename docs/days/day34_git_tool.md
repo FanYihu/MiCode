@@ -2,7 +2,7 @@
 
 ## 今日目标
 
-新增一个只读 Git 工具，让 MiniCode 能看见当前仓库状态和 diff。
+新增一个只读 Git 工具，让 Micode 能看见当前仓库状态和 diff。
 
 Day 33 已经统一了工具结果 metadata。Day 34 要把 git 能力作为一个普通工具接入，为后续 Agent 复盘“我改了什么”打基础。
 
@@ -45,7 +45,7 @@ references/MiniCode-Python/minicode/tools/git.py
 新增文件：
 
 ```text
-minicode/src/minicode/git_tools.py
+micode/src/micode/git_tools.py
 ```
 
 建议结构：
@@ -64,10 +64,10 @@ class GitTools:
 ## 要修改的文件
 
 ```text
-minicode/src/minicode/git_tools.py
-minicode/src/minicode/tool_registry.py
-minicode/tests/test_git_tools.py
-minicode/tests/test_tool_registry.py
+micode/src/micode/git_tools.py
+micode/src/micode/tool_registry.py
+micode/tests/test_git_tools.py
+micode/tests/test_tool_registry.py
 docs/SDD.md
 ```
 

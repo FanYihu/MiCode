@@ -2,7 +2,7 @@
 
 ## 今日目标
 
-让真实模型调用失败时，MiniCode 也能返回 trace。
+让真实模型调用失败时，Micode 也能返回 trace。
 
 现在 Agent Loop 里有一个风险点：
 
@@ -73,7 +73,7 @@ InvalidAgentAction：JSON 能解析，但 action 内容不合法
 第一版建议：
 
 - `TextLLM` 不吞异常
-- `MiniCodeAgent.run()` 统一捕获
+- `MicodeAgent.run()` 统一捕获
 
 原因是 Agent 才有 `Run` 和 `TraceRecorder`，只有它能把错误写进 trace。
 
@@ -141,21 +141,21 @@ if not config.api_key:
 建议改：
 
 ```text
-minicode/src/minicode/agent.py
+micode/src/micode/agent.py
 ```
 
 新增：
 
 1. `LLMError`
 2. `OpenAICompatibleTextClient` 包装请求错误
-3. `MiniCodeAgent.run()` 捕获 `LLMError / InvalidActionText / InvalidAgentAction`
+3. `MicodeAgent.run()` 捕获 `LLMError / InvalidActionText / InvalidAgentAction`
 4. 缺少 API key 时抛出清晰的 `LLMError`
 
 建议改：
 
 ```text
-minicode/tests/test_agent_integration.py
-minicode/tests/test_llm_config.py
+micode/tests/test_agent_integration.py
+micode/tests/test_llm_config.py
 ```
 
 ## 建议测试
@@ -179,7 +179,7 @@ minicode/tests/test_llm_config.py
 ## 完成后运行
 
 ```bash
-cd /Users/fanyihu/Desktop/技能学习/minicode
+cd /Users/fanyihu/Desktop/技能学习/micode
 PYTHONPATH=src python3 -m pytest
 ```
 
