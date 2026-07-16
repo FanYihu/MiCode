@@ -31,7 +31,7 @@ Day 35 的重点是确认：
 
 - Day 31：`FileTools.replace_text`。
 - Day 32：`ToolRegistry`。
-- Day 33：统一 metadata 和 `permission_checker`。
+- Day 33：统一 metadata 和工具权限生命周期；当前权限实现已升级为 PermissionHook。
 - Day 34：`GitTools`。
 
 ## 参考项目学到了什么
@@ -64,7 +64,7 @@ references/MiniCode-Python/minicode/agent_loop.py
 
 ## 做了什么
 
-- 更新 Stage 1 文档，记录 Tool Registry、工具 metadata 契约、`permission_checker` 和只读 Git Tool 已完成。
+- 更新 Stage 1 文档，记录 Tool Registry、工具 metadata 契约、权限 Hook 和只读 Git Tool 已完成。
 - 更新 Stage 1 遗留问题，把“硬编码工具分发、没有 Git 工具、没有工具契约”改成新的真实缺口。
 - 更新 Stage 2 文档，明确后续 Skill、MCP、SubAgent 都应复用 Tool Registry。
 - 更新 Stage 2 Roadmap，确认工具 metadata 顶层字段统一，工具特有信息进入 `details`。

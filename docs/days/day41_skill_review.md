@@ -40,6 +40,21 @@ Day 41 要确认边界：
 2. Stage 2 文档明确 Skill 不替代 Tool Registry。
 3. 全量测试通过。
 
+## 做了什么
+
+- 复盘 Day 36-Day 40 的 Skill 主线，确认 Skill 数据、加载、Summary 注入、Router 和 `load_skill` 已形成最小闭环。
+- 明确 Skill 和 Tool 的边界：Skill 描述“怎么做”，Tool 执行“实际动作”。
+- 更新 Stage 2 文档，补充当前 Skill 闭环流转图。
+- 新增 Agent 集成测试，验证 `load_skill` 通过 Tool Registry 调用后，完整 Skill 内容会进入 observations 并继续驱动后续 final。
+- 记录下一阶段边界：Skill 不负责经验沉淀，Day 42 开始进入 Memory 主线。
+
+## 遗留问题
+
+- `route_skills` 当前只是小规模全量返回和大规模关键词兜底。
+- Skill 目前只从项目 `.minicode/skills` 加载，还没有全局 Skill、用户 Skill 或优先级合并。
+- Skill 内容进入 observations 后还没有做压缩和 artifact 外置，这会留到 Context 主线处理。
+- 成功/失败运行经验还没有沉淀为 Memory，这正是下一章要开始解决的问题。
+
 ## 思考题
 
 Skill 和 Tool 最大的区别是什么？

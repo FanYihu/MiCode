@@ -4,7 +4,7 @@
 
 ### Day 31：Structured File Edit Tool
 
-承接现有 `file_tools.py`，补结构化编辑能力。
+承接现有 `tools/file.py`，补结构化编辑能力。
 
 - 按旧文本替换新文本。
 - 默认只替换第一个匹配项。
@@ -54,50 +54,61 @@
 
 ## 自进化记忆沉淀
 
-- Day 42：Memory 数据结构。
-- Day 43：Trace Reflection。
-- Day 44：Memory Store。
-- Day 45：Memory Index。
-- Day 46：Memory Recall。
-- Day 47：Memory Prompt Injection。
-- Day 48：Memory Review。
+- Day 42：Memory Architecture。
+- Day 43：Session / Thread Runtime。
+- Day 44：Event Log / Message History。
+- Day 45：Working Memory。
+- Day 46：Context Compression / Session Summary。
+- Day 47：Episodic Memory。
+- Day 48：Semantic Memory。
+- Day 49：Procedural Memory，与 Skill 打通。
+- Day 50：Memory Graph 数据结构。
+- Day 51：Entity / Relation Extraction。
+- Day 52：Temporal Facts / Conflict Resolution。
+- Day 53：Hybrid Retrieval，keyword + vector-ready + graph traversal。
+- Day 54：Memory Ranking / Injection Policy。
+- Day 55：Memory Review。
+- Memory-Skill Bridge 补充章节：Skill Candidate Pipeline，从 Procedural Memory 生成候选 Skill，经 Review 后再提升为正式 Skill。
 
 ## 分层上下文压缩
 
-- Day 49：Context Layer 设计。
-- Day 50：Tool Result Summary。
-- Day 51：Artifact Placeholder。
-- Day 52：Artifact Read Tool。
-- Day 53：Token Estimate。
-- Day 54：Auto Compaction。
-- Day 55：Context Review。
+- Day 56：Context Layer 设计。
+- Day 57：Tool Result Summary。
+- Day 58：Artifact Placeholder。
+- Day 59：Runtime Stability：幂等写入、Prompt Cache、Decision Freeze。
+- Day 60：Artifact Read Tool。
+- Day 61：Token Estimate。
+- Day 62：Auto Compaction。
+- Day 63：Context Review。
 
 ## 中心化多 Agent 协作
 
-- Day 56：SubAgent Tool Contract。
-- Day 57：Reviewer SubAgent。
-- Day 58：Tester SubAgent。
-- Day 59：Implementer SubAgent。
-- Day 60：Main Agent Approval。
-- Day 61：Fork Mode。
-- Day 62：Multi-Agent Review。
+- 补充章节：Hook Runtime 与 Permission 集成，为 SubAgent、Security 和 MCP 提供统一生命周期扩展点。
+
+- Day 64：SubAgent Tool Contract。
+- Day 65：Reviewer SubAgent。
+- Day 66：Tester SubAgent。
+- Day 67：Implementer SubAgent。
+- Day 68：Main Agent Approval。
+- Day 69：Fork Mode。
+- Day 70：Multi-Agent Review。
 
 ## 权限与安全审查
 
-- Day 63：Permission Rule 分层。
-- Day 64：Tool Self-Check。
-- Day 65：Untrusted Content 标记。
-- Day 66：Prompt Injection 防御。
-- Day 67：Human Review Flow。
-- Day 68：Security Trace Audit。
-- Day 69：Security Review。
+- Day 71：Permission Rule 分层。
+- Day 72：Tool Self-Check。
+- Day 73：Untrusted Content 标记。
+- Day 74：Prompt Injection 防御。
+- Day 75：Human Review Flow。
+- Day 76：Security Trace Audit。
+- Day 77：Security Review。
 
 ## MCP Track
 
-- Day 70：MCP Concept Review。
-- Day 71：MCP Config。
-- Day 72：Mock MCP Server。
-- Day 73：MCP Tool Discovery。
-- Day 74：MCP Tool Call。
-- Day 75：MCP Permission。
-- Day 76：MCP Review。
+- Day 78：MCP Concept Review。
+- Day 79：MCP Config。
+- Day 80：Mock MCP Server。
+- Day 81：MCP Tool Discovery。
+- Day 82：MCP Tool Call。
+- Day 83：MCP Permission。
+- Day 84：MCP Review。

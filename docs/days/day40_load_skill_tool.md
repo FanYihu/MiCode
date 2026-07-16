@@ -68,6 +68,7 @@ CONTENT:
 - 未知 Skill 返回 `ToolResult(ok=False, output="Unknown skill: ...")`。
 - 返回 metadata 继续遵守 Tool Trace Contract，工具细节进入 `details`。
 - 补充测试覆盖成功加载、未知 Skill 和 Registry 注册。
+- 进一步重构目录边界：新增 `tools/` 子包，`tools/registry.py` 只保留契约和统一调用，默认工具装配放到 `tools/default.py`，`load_skill` 的具体适配放到 `tools/skill.py`。
 
 ## 思考题
 

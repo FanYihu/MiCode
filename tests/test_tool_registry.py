@@ -1,12 +1,13 @@
 import pytest
 import subprocess
 
-from minicode.tool_registry import (
+from minicode.skills import Skill
+from minicode.tools.default import create_default_tool_registry
+from minicode.tools.registry import (
     DuplicateToolName,
     ToolDefinition,
     ToolRegistry,
     ToolResult,
-    create_default_tool_registry,
 )
 from minicode.workspace import Workspace
 
@@ -24,6 +25,59 @@ def test_tool_registry_registers_and_finds_tool():
     assert registry.get("echo") is tool
     assert registry.list_names() == ["echo"]
     assert registry.describe_tools() == ["- echo: Return the input text."]
+
+
+def test_tool_registry_exports_openai_function_tools():
+    registry = ToolRegistry()
+    registry.register(
+        ToolDefinition(
+            name="echo",
+            description="Return the input text.",
+            parameters={
+                "type": "object",
+                "properties": {"text": {"type": "string"}},
+                "required": ["text"],
+                "additionalProperties": False,
+            },
+            handler=lambda args: ToolResult(ok=True, output=args["text"]),
+        )
+    )
+
+    tools = registry.openai_tools()
+
+    assert tools == [
+        {
+            "type": "function",
+            "function": {
+                "name": "echo",
+                "description": "Return the input text.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {"text": {"type": "string"}},
+                    "required": ["text"],
+                    "additionalProperties": False,
+                },
+            },
+        }
+    ]
+
+
+def test_default_registry_exposes_required_tool_parameters(tmp_path):
+    registry = create_default_tool_registry(Workspace(str(tmp_path)))
+    tools = {
+        item["function"]["name"]: item["function"]["parameters"]
+        for item in registry.openai_tools()
+    }
+
+    assert tools["read_file"]["required"] == ["path"]
+    assert tools["replace_text"]["required"] == ["path", "old", "new"]
+    assert tools["run_shell"]["required"] == ["command"]
+    assert tools["list_files"]["properties"] == {}
+    assert registry.is_parallel_safe("list_files") is True
+    assert registry.is_parallel_safe("read_file") is True
+    assert registry.is_parallel_safe("git_status") is True
+    assert registry.is_parallel_safe("replace_text") is False
+    assert registry.is_parallel_safe("run_shell") is False
 
 
 def test_tool_registry_calls_registered_tool():
@@ -64,7 +118,9 @@ def test_tool_registry_returns_error_for_unknown_tool():
     assert result.metadata["ok"] is False
     assert result.metadata["result_summary"] == "Unknown tool: missing"
     assert result.metadata["error"] == "unknown_tool"
-    assert result.metadata["details"] == {}
+    assert result.metadata["details"]["failure_class"] == "unknown_tool"
+    assert result.metadata["details"]["recoverable"] is True
+    assert "available_tools" in result.metadata["details"]
 
 
 def test_tool_registry_rejects_duplicate_tool_names():
@@ -96,7 +152,9 @@ def test_default_tool_registry_lists_and_reads_workspace_files(tmp_path):
     assert read_result.metadata["ok"] is True
     assert read_result.metadata["result_summary"] == "hello"
     assert read_result.metadata["error"] == ""
-    assert read_result.metadata["details"] == {"path": "README.md"}
+    assert read_result.metadata["details"]["path"] == "README.md"
+    assert read_result.metadata["details"]["tool_self_check"]["status"] == "passed"
+    assert read_result.metadata["details"]["tool_self_check_result"]["status"] == "passed"
 
 
 def test_default_tool_registry_replaces_text_and_returns_diff(tmp_path):
@@ -177,6 +235,50 @@ def test_default_tool_registry_loads_project_skill(tmp_path):
     assert result.metadata["details"]["name"] == "python-test"
 
 
+def test_default_tool_registry_loads_external_skill(tmp_path):
+    registry = create_default_tool_registry(
+        Workspace(str(tmp_path)),
+        external_skills=[
+            Skill(
+                name="user-test",
+                description="User-level test flow.",
+                content="Use the user test flow.",
+            )
+        ],
+    )
+
+    result = registry.call("load_skill", {"name": "user-test"})
+
+    assert result.ok is True
+    assert "SKILL: user-test" in result.output
+    assert "Use the user test flow." in result.output
+
+
+def test_default_tool_registry_prefers_project_skill_over_external_skill(tmp_path):
+    skill_dir = tmp_path / ".minicode" / "skills" / "python-test"
+    skill_dir.mkdir(parents=True)
+    (skill_dir / "SKILL.md").write_text(
+        "# Python Test\n\nProject flow.\n\nUse project pytest.",
+        encoding="utf-8",
+    )
+    registry = create_default_tool_registry(
+        Workspace(str(tmp_path)),
+        external_skills=[
+            Skill(
+                name="python-test",
+                description="User flow.",
+                content="Use user pytest.",
+            )
+        ],
+    )
+
+    result = registry.call("load_skill", {"name": "python-test"})
+
+    assert result.ok is True
+    assert "Project flow." in result.output
+    assert "Use user pytest." not in result.output
+
+
 def test_default_tool_registry_returns_error_for_unknown_skill(tmp_path):
     registry = create_default_tool_registry(Workspace(str(tmp_path)))
 
@@ -201,6 +303,8 @@ def test_default_tool_registry_denies_dangerous_shell_command(tmp_path):
     assert result.metadata["ok"] is False
     assert result.metadata["error"]
     assert result.metadata["details"]["decision"]
+    assert result.metadata["details"]["failure_class"] == "permission_denied"
+    assert result.metadata["details"]["recoverable"] is False
     assert "review_message" in result.metadata["details"]
 
 
@@ -236,3 +340,38 @@ def test_tool_registry_uses_output_as_error_when_failed_tool_has_no_error_metada
 
     assert result.ok is False
     assert result.metadata["error"] == "failed"
+    assert result.metadata["details"]["failure_class"] == "tool_error"
+    assert result.metadata["details"]["recoverable"] is True
+
+
+def test_tool_registry_classifies_missing_argument_exception():
+    registry = ToolRegistry()
+    registry.register(
+        ToolDefinition(
+            name="needs_path",
+            description="Require path.",
+            handler=lambda args: ToolResult(ok=True, output=args["path"]),
+        )
+    )
+
+    result = registry.call("needs_path", {})
+
+    assert result.ok is False
+    assert result.metadata["error"] == "KeyError"
+    assert result.metadata["details"]["failure_class"] == "invalid_args"
+    assert result.metadata["details"]["recoverable"] is True
+    assert "missing required argument" in result.metadata["details"]["retry_hint"]
+
+
+def test_default_tool_registry_classifies_failed_shell_command(tmp_path):
+    registry = create_default_tool_registry(Workspace(str(tmp_path)))
+
+    result = registry.call(
+        "run_shell",
+        {"command": "python3 -c 'import sys; sys.exit(7)'"},
+    )
+
+    assert result.ok is False
+    assert result.metadata["details"]["exit_code"] == 7
+    assert result.metadata["details"]["failure_class"] == "command_failed"
+    assert result.metadata["details"]["recoverable"] is True

@@ -1,4 +1,4 @@
-from minicode.shell_tools import ShellTools
+from minicode.tools.shell import ShellTools
 from minicode.workspace import Workspace
 
 

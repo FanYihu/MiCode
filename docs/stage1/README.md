@@ -27,14 +27,16 @@ MiniCode 的基础 Runtime 由三个核心对象组成：
 - `models.py`：定义 Runtime 数据模型、状态枚举和 Run 状态机。
 - `trace.py`：记录 Step/Event，并导出 trace dict。
 - `workspace.py`：管理工作区路径边界，支持文件列表、读取和搜索。
-- `file_tools.py`：提供文件读取、写入、存在判断、diff 预览和基础结构化编辑。
-- `git_tools.py`：提供只读 Git 状态和 diff 观察能力。
-- `shell_tools.py`：在工作区执行命令，捕获 stdout、stderr、exit code 和超时。
 - `permissions.py`：对文件写入和 shell 命令做 allow/review/deny 审核。
 - `agent.py`：AgentAction、action parser、prompt builder、LLM adapter 和 MiniCodeAgent loop。
 - `cli.py`：命令行入口，支持固定任务、agent 模式和 trace 管理。
 - `persistence.py`：trace 保存、加载、查看、过滤、清理和 Markdown 导出。
-- `tool_registry.py`：统一工具注册、调用、权限检查和工具 trace metadata 契约。
+- `tools/registry.py`：统一工具注册、调用、权限检查和工具 trace metadata 契约。
+- `tools/default.py`：装配默认工具集合。
+- `tools/file.py`：提供文件读取、写入、存在判断、diff 预览和基础结构化编辑。
+- `tools/git.py`：提供只读 Git 状态和 diff 观察能力。
+- `tools/shell.py`：在工作区执行命令，捕获 stdout、stderr、exit code 和超时。
+- `tools/skill.py`：把项目 Skill 加载能力适配成可注册工具。
 
 ## 已完成能力
 
@@ -56,7 +58,7 @@ MiniCode 的基础 Runtime 由三个核心对象组成：
 - 结构化文本替换，默认只替换第一处匹配并返回 diff。
 - Tool Registry 统一注册 `list_files`、`read_file`、`replace_text`、`run_shell`、`git_status`、`git_diff`。
 - 工具调用 metadata 顶层字段统一，工具特有信息进入 `details`。
-- 工具权限检查进入 `ToolDefinition.permission_checker`。
+- 工具权限检查已从 ToolDefinition 解耦，由 `PermissionHook` 订阅 `before_tool_call` 生命周期。
 - 只读 Git 状态和 diff 观察能力。
 
 ### Agent Loop

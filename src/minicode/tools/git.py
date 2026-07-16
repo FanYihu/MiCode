@@ -1,6 +1,6 @@
 import subprocess
 
-from minicode.tool_registry import ToolResult
+from minicode.tools.registry import ToolResult
 from minicode.workspace import Workspace
 
 

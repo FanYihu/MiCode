@@ -1,6 +1,6 @@
 import subprocess
 
-from minicode.git_tools import GitTools
+from minicode.tools.git import GitTools
 from minicode.workspace import Workspace
 
 

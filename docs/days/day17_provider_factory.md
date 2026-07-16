@@ -189,6 +189,213 @@ TextLLM 负责 prompt -> text -> AgentAction
 MiniCodeAgent 负责执行 action
 ```
 
+## 后续升级：原生 Tool Calls
+
+当前真实模型调用已不再要求模型把工具调用伪装成正文 JSON，而是使用 OpenAI-compatible Chat Completions 的独立字段：
+
+```python
+response = client.chat.completions.create(
+    model=self.model,
+    messages=messages,
+    tools=registry.openai_tools(),
+    tool_choice="auto",
+)
+```
+
+工具链路变为：
+
+```text
+ToolDefinition.parameters
+  -> ToolRegistry.openai_tools()
+  -> request.tools
+  -> response.message.tool_calls
+  -> AgentAction
+  -> ToolRegistry.call()
+```
+
+每个 `ToolDefinition` 通过 `parameters` 保存 JSON Schema。真实 OpenAI-compatible client 优先使用原生 `tool_calls`；旧的正文 JSON action 解析仍保留，供 MockLLM、测试和不支持 tools 的 client 使用。
+
+当前 Agent 仍按一轮一个工具调用执行。模型一次返回多个 `tool_calls` 时会明确报错，避免只执行第一个调用造成行为不完整；批量和并行执行将在独立执行策略中实现。
+
+## 完整 OpenAI-compatible 消息协议
+
+原生工具调用不能只解析第一次响应，还必须把模型调用和工具结果放回下一次请求：
+
+```text
+user message
+  -> assistant message(tool_calls)
+  -> tool message(tool_call_id + content)
+  -> assistant message(final text or next tool_calls)
+```
+
+当前实现拆成三层：
+
+```text
+ToolRegistry
+  负责工具名称、描述、JSON Schema 和执行
+
+OpenAICompatibleTextClient
+  负责 messages/tools 请求、ModelTurn 解析和供应商能力适配
+
+TextLLM
+  负责保存 assistant/tool 消息，并把 ModelTurn 转成 AgentAction
+```
+
+通用响应结构：
+
+```python
+ModelTurn(
+    text="",
+    tool_calls=[
+        ModelToolCall(
+            id="call_123",
+            name="read_file",
+            arguments={"path": "README.md"},
+        )
+    ],
+    assistant_message={...},
+)
+```
+
+Agent 执行工具后调用：
+
+```python
+llm.record_tool_result(action, result.output)
+```
+
+它会追加：
+
+```python
+{
+    "role": "tool",
+    "tool_call_id": action.tool_call_id,
+    "name": action.tool,
+    "content": result.output,
+}
+```
+
+## Provider Capabilities
+
+OpenAI-compatible 只代表基础协议接近，不代表所有可选字段完全一致。供应商差异集中在配置中：
+
+```toml
+[llm.capabilities]
+native_tools = true
+parallel_tool_calls = false
+reasoning_content = true
+strict_tool_schema = false
+```
+
+- `native_tools`：是否使用独立 `tools/tool_calls`；关闭时退回正文 JSON action。
+- `parallel_tool_calls`：供应商是否可能一次返回多个工具调用，执行层后续支持。
+- `reasoning_content`：是否把思考模型返回的字段带回下一轮消息。
+- `strict_tool_schema`：是否给 function tool 增加 `strict=true`。
+
+这样接入其他 OpenAI-compatible 模型时，通常只需要修改 `config.toml`，不需要修改 Agent 和 Tool Registry。
+
+## 批量 Tool Calls 执行策略
+
+当供应商支持一轮返回多个 `tool_calls` 时，`TextLLM.next_turn()` 会返回：
+
+```python
+AgentTurn(
+    actions=[
+        AgentAction(tool="read_file", ...),
+        AgentAction(tool="git_status", ...),
+    ]
+)
+```
+
+工具是否允许并行由 `ToolDefinition.parallel_safe` 声明，不在 Agent 中按名称判断：
+
+```python
+ToolDefinition(
+    name="read_file",
+    parallel_safe=True,
+    ...
+)
+```
+
+默认策略：
+
+- `list_files`、`read_file`、`git_status`、`git_diff`、`load_skill` 是只读工具，可以并行。
+- `replace_text`、`write_file`、`run_shell` 有副作用，必须串行。
+- 连续出现的只读工具组成一个并行组。
+- 写操作保持模型给出的顺序逐个执行。
+- 写操作失败后，停止后续调用。
+- 并行组中的调用会全部完成并分别记录结果。
+
+混合批次示例：
+
+```text
+read_file A ┐
+read_file B ┘ parallel
+replace_text  sequential
+run_shell     sequential
+```
+
+每个调用仍然拥有独立 Step 和 Event，并记录：
+
+```text
+batch_id
+batch_index
+batch_size
+tool_call_id
+execution_mode
+```
+
+所有工具结果按模型原始调用顺序追加为 `role=tool` 消息，再发起下一次模型请求。
+
+### Python 线程池实现
+
+MiniCode 的并行组通过 `concurrent.futures.ThreadPoolExecutor` 执行。
+
+需要记住：
+
+```text
+ThreadPoolExecutor
+    线程池管理器
+
+executor.submit(fn, args...)
+    把函数交给工作线程
+    立即返回 Future
+
+Future
+    保存未来的结果或异常
+
+future.result()
+    等待并取得结果
+
+with ThreadPoolExecutor(...)
+    自动等待任务完成并关闭线程池
+```
+
+项目核心代码：
+
+```python
+with ThreadPoolExecutor(max_workers=len(indexed_actions)) as executor:
+    futures = [
+        executor.submit(
+            self.tool_registry.call,
+            action.tool,
+            action.args,
+        )
+        for _, action in indexed_actions
+    ]
+    results = [
+        future.result()
+        for future in futures
+    ]
+```
+
+`submit()` 连续提交任务后，多个 Worker 可以同时执行工具。主线程随后调用 `future.result()` 等待结果；等待某个 Future 时，其他工作线程仍在运行。
+
+完整线程、GIL、Future、异常传播和 MiniCode 代码映射见：
+
+```text
+笔记/python多线程与线程池.md
+```
+
 ## 你要手写的内容
 
 建议改：

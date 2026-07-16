@@ -13,6 +13,10 @@
 - `stage1/`：Stage 1 架构、已完成能力和遗留问题。
 - `stage2/`：Stage 2 边界、参考项目映射、路线和开发规则。
 
+## 学习笔记
+
+- `../笔记/python多线程与线程池.md`：线程、GIL、ThreadPoolExecutor、Future，以及 MiniCode 批量工具并行执行原理。
+
 ## 使用规则
 
 后续每章先写或更新对应章节文档，再实现代码和测试。Stage 1 只记录已完成基线，Stage 2 只记录后续路线和开发规则。

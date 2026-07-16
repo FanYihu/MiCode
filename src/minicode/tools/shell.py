@@ -1,6 +1,7 @@
 import subprocess
 from dataclasses import dataclass
 
+from minicode.tools.registry import ToolResult
 from minicode.workspace import Workspace
 
 
@@ -45,3 +46,17 @@ class ShellTools:
             stderr=completed.stderr,
             timed_out=False,
         )
+
+
+def run_shell_tool(shell_tools: ShellTools, args: dict) -> ToolResult:
+    """把 CommandResult 适配为 ToolResult，保留命令执行元信息。"""
+    result = shell_tools.run(args["command"])
+    return ToolResult(
+        ok=result.exit_code == 0 and not result.timed_out,
+        output=result.stdout or result.stderr,
+        metadata={
+            "command": args["command"],
+            "exit_code": result.exit_code,
+            "timed_out": result.timed_out,
+        },
+    )

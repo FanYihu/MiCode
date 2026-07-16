@@ -89,7 +89,7 @@ docs/SDD.md
 2. 未知工具也符合同一 metadata 契约。
 3. 默认工具集合不在 metadata 顶层摊平工具特有字段；工具细节统一放进 `details`。
 4. result summary 不输出无限长内容。
-5. 工具权限检查进入 `ToolDefinition.permission_checker`，Agent 不再为某个工具写特殊分支。
+5. 工具权限检查统一进入工具生命周期；当前实现已升级为 `PermissionHook -> before_tool_call`，Agent 不为具体工具写权限分支。
 6. 全量测试通过。
 
 ## 做了什么
@@ -100,7 +100,7 @@ docs/SDD.md
 - 默认工具的扩展字段统一放进 `details`，例如 `path`、`command`、`exit_code`、`timed_out`。
 - `result_summary` 对长输出做截断，完整内容仍保留在 `ToolResult.output`。
 - `MiniCodeAgent` 改为走 `AgentAction -> ToolRegistry.call(...) -> ToolResult -> Trace + observations`。
-- `ToolDefinition` 新增 `permission_checker`，`run_shell` 的危险命令审核在工具注册层完成。
+- 权限最初在 ToolDefinition 注册层完成，现已解耦为高优先级 PermissionHook，并复用同一 ToolResult metadata 契约。
 - `TextLLM` 的 prompt 工具说明改为由 Registry 注入，新增工具注册后可以进入模型提示。
 - 补充测试覆盖成功工具、失败工具、未知工具、默认工具、长输出摘要和 Agent 自定义工具调用。
 

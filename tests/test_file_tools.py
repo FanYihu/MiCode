@@ -1,6 +1,6 @@
 import pytest
 
-from minicode.file_tools import EmptySearchText, FileTools, SearchTextNotFound
+from minicode.tools.file import EmptySearchText, FileTools, SearchTextNotFound
 from minicode.workspace import Workspace
 
 

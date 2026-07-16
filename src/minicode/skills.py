@@ -6,6 +6,7 @@ from minicode.workspace import Workspace
 
 
 SMALL_SKILL_COUNT = 20
+_SKILL_DIRECTORIES: dict[int, Path] = {}
 
 
 @dataclass
@@ -16,7 +17,6 @@ class Skill:
     description: str
     content: str
     tags: list[str] = field(default_factory=list)
-    tools: list[str] = field(default_factory=list)
 
 
 def format_skill_for_prompt(skill: Skill) -> str:
@@ -28,8 +28,6 @@ def format_skill_for_prompt(skill: Skill) -> str:
 
     if skill.tags:
         lines.append(f"Tags: {', '.join(skill.tags)}")
-    if skill.tools:
-        lines.append(f"Tools: {', '.join(skill.tools)}")
 
     lines.extend(["", skill.content])
     return "\n".join(lines)
@@ -40,8 +38,6 @@ def format_skill_summary(skill: Skill) -> str:
     suffixes = []
     if skill.tags:
         suffixes.append(f"tags: {', '.join(skill.tags)}")
-    if skill.tools:
-        suffixes.append(f"tools: {', '.join(skill.tools)}")
 
     suffix = f" [{' | '.join(suffixes)}]" if suffixes else ""
     return f"- {skill.name}: {skill.description}{suffix}"
@@ -77,16 +73,35 @@ def load_skill_from_file(path: str) -> Skill:
     """从单个 SKILL.md 文件加载 Skill，名称默认取父目录名。"""
     skill_path = Path(path)
     content = skill_path.read_text(encoding="utf-8")
-    return Skill(
+    skill = Skill(
         name=skill_path.parent.name,
         description=extract_skill_description(content),
         content=content,
     )
+    # Skill 本体只保留四个字段；source directory 作为 loader 的内部索引供路由层读取 examples。
+    _SKILL_DIRECTORIES[id(skill)] = skill_path.parent
+    return skill
+
+
+def get_skill_directory(skill: Skill) -> Optional[Path]:
+    """返回 Skill 来源目录；手动构造的 Skill 没有来源目录。"""
+    return _SKILL_DIRECTORIES.get(id(skill))
 
 
 def discover_project_skills(workspace: Workspace) -> list[Skill]:
     """扫描项目级 .minicode/skills/*/SKILL.md。"""
     skills_root = workspace.resolve_path(".minicode/skills")
+    return discover_skills_in_directory(skills_root)
+
+
+def discover_user_skills(skills_root: Optional[str] = None) -> list[Skill]:
+    """扫描用户级 Skill；默认读取 ~/.minicode/skills。"""
+    root = Path(skills_root) if skills_root else Path.home() / ".minicode" / "skills"
+    return discover_skills_in_directory(root)
+
+
+def discover_skills_in_directory(skills_root: Path) -> list[Skill]:
+    """扫描任意 Skill 根目录下的 */SKILL.md。"""
     if not skills_root.exists():
         return []
 
@@ -113,49 +128,96 @@ def load_project_skill(workspace: Workspace, name: str) -> Optional[Skill]:
 
 
 def route_skills(task: str, skills: list[Skill], limit: int = SMALL_SKILL_COUNT) -> list[Skill]:
-    """选择要注入 Summary 的 Skill；小规模时直接返回全部。"""
+    """按约定策略选择 Skill：显式点名优先，小规模全量返回。"""
     if limit <= 0 or not skills:
         return []
+
+    explicit_skills = find_explicit_skills(task, skills)
+    if explicit_skills:
+        return explicit_skills[:limit]
 
     if len(skills) <= SMALL_SKILL_COUNT:
         return skills[:limit]
 
-    scored = []
-    tokens = _tokenize(task)
+    # 中/大规模场景不在这里手写打分器；交给 LLM Router 或后续 Embedding/Graph Router。
+    return []
+
+
+def route_external_skills(
+    task: str,
+    skills: list[Skill],
+    router,
+    limit: int = SMALL_SKILL_COUNT,
+) -> list[Skill]:
+    """兼容入口；实际实现放在 skill_routing，避免 skills.py 变成大杂烩。"""
+    from minicode.skill_routing import route_external_skills as _route_external_skills
+
+    return _route_external_skills(task, skills, router, limit)
+
+
+def merge_project_and_external_skills(
+    project_skills: list[Skill],
+    external_skills: list[Skill],
+) -> list[Skill]:
+    """合并 Skill，项目级同名优先，外部同名 Skill 被忽略。"""
+    project_names = {skill.name for skill in project_skills}
+    merged = list(project_skills)
+    for skill in external_skills:
+        if skill.name in project_names:
+            continue
+        merged.append(skill)
+    return merged
+
+
+def find_explicit_skills(task: str, skills: list[Skill]) -> list[Skill]:
+    """只处理用户明确点名 Skill name 的情况，不做相关性猜测。"""
     task_text = task.lower()
-    for index, skill in enumerate(skills):
-        score = _score_skill(skill, tokens, task_text)
-        if score > 0:
-            scored.append((score, -index, skill))
-
-    scored.sort(reverse=True)
-    return [skill for _, _, skill in scored[:limit]]
-
-
-def _score_skill(skill: Skill, tokens: set[str], task_text: str) -> int:
-    """用关键词做大规模场景的兜底排序，后续可替换成 LLM Router。"""
-    score = 0
-    name = skill.name.lower()
-    description = skill.description.lower()
-
-    if name and name in task_text:
-        score += 5
-
-    for token in tokens:
-        if token in name:
-            score += 3
-        if token in description:
-            score += 2
-        for tag in skill.tags:
-            if token in tag.lower():
-                score += 2
-
-    return score
+    matched = []
+    for skill in skills:
+        normalized_name = skill.name.lower()
+        if normalized_name and normalized_name in task_text:
+            matched.append(skill)
+    return matched
 
 
-def _tokenize(text: str) -> set[str]:
-    """按简单字符规则切分任务文本，避免引入复杂检索依赖。"""
-    normalized = []
-    for char in text.lower():
-        normalized.append(char if char.isalnum() or char in {"-", "_"} else " ")
-    return {part for part in "".join(normalized).split() if part}
+def select_skills_by_name(
+    names: list[str],
+    skills: list[Skill],
+    limit: int = SMALL_SKILL_COUNT,
+) -> list[Skill]:
+    """按 LLM Router 返回的名称选择 Skill，忽略未知名称并保持模型给出的顺序。"""
+    if limit <= 0:
+        return []
+
+    skill_by_name = {skill.name: skill for skill in skills}
+    selected = []
+    seen = set()
+    for name in names:
+        if name in seen:
+            continue
+        skill = skill_by_name.get(name)
+        if skill is None:
+            continue
+        selected.append(skill)
+        seen.add(name)
+        if len(selected) >= limit:
+            break
+    return selected
+
+
+from minicode.skill_routing import (  # noqa: E402
+    LLMSkillRouter,
+    TaskIntent,
+    SkillRoutingProfile,
+    TwoStageSkillRouter,
+    build_skill_rerank_prompt,
+    build_skill_router_prompt,
+    build_task_intent_prompt,
+    build_skill_routing_profile,
+    extract_markdown_section_items,
+    load_skill_examples,
+    parse_skill_router_response,
+    parse_task_intent_response,
+    recall_skill_candidates,
+    route_skills_with_llm,
+)
