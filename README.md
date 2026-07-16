@@ -1,6 +1,5 @@
 # Micode
 
-![Micode architecture preview](image.png)
 
 Micode 是一个从零手写 Coding Agent 的学习项目。它以 MiniCode-Python 的固定参考基线为能力对齐目标，但代码和设计都围绕自己的学习路线逐章实现：先跑通最小 Agent Loop，再逐步加入 ToolRegistry、Trace、Memory、Skill、Context、Security、MCP、Runtime Recovery 和 SubAgent。
 
