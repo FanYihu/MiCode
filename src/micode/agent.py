@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from concurrent.futures import ThreadPoolExecutor
 import json
-from typing import Dict, Optional
+from typing import Callable, Dict, Optional
 
 from micode.context.artifacts import ArtifactStore, maybe_store_tool_result_artifact
 from micode.context.decision import freeze_decision
@@ -10,6 +10,7 @@ from micode.context.tool_results import summarize_tool_result
 from micode.models import EventType, Run, StepType
 from micode.mcp.config import MCPServerConfig
 from micode.security import wrap_untrusted_observation
+from micode.runtime import RuntimeEvent, RuntimeProfile, StopReason, TurnPhase
 from micode.skills import (
     LLMSkillRouter,
     Skill,
@@ -579,7 +580,14 @@ class MicodeAgent:
         if hasattr(self.llm, "set_tool_definitions"):
             self.llm.set_tool_definitions(self.tool_registry.openai_tools())
 
-    def run(self, task: str) -> dict:
+    def run(
+        self,
+        task: str,
+        runtime_profile: Optional[RuntimeProfile] = None,
+        event_sink: Optional[Callable[[RuntimeEvent], None]] = None,
+    ) -> dict:
+        """执行任务；event_sink 存在时同步发出真实执行时序事件。"""
+        profile = runtime_profile or RuntimeProfile()
          # 创建运行实例和轨迹记录器
         run = Run()
         self._active_run_id = run.id
@@ -610,11 +618,29 @@ class MicodeAgent:
          
         # 标记任务开始执行
         run.start()
+        self._emit_runtime(
+            event_sink,
+            "run_started",
+            TurnPhase.START,
+            run,
+            metadata={"profile": profile.name},
+        )
         if hasattr(self.llm, "reset_conversation"):
             self.llm.reset_conversation()
         observations = []
         # Agent Loop：一次模型轮次可以返回一个或多个工具调用。
-        for turn_index in range(1, 10):
+        tool_evidence_count = 0
+        for turn_index in range(1, profile.max_turns + 1):
+          self._emit_runtime(
+              event_sink,
+              "model_started",
+              TurnPhase.EXPLORE,
+              run,
+              turn_index=turn_index,
+              metadata={
+                  "widening": turn_index >= profile.widening_after_turn,
+              },
+          )
           run.metadata.setdefault("token_estimates", []).append(
               self._estimate_turn_tokens(task, observations, turn_index)
           )
@@ -629,19 +655,57 @@ class MicodeAgent:
               decision_freeze.to_dict()
           )
           try:
-            turn = self._next_turn(task, observations)
+            turn = self._next_turn_with_retry(
+                task,
+                observations,
+                profile.max_model_retries,
+            )
           except (LLMError, InvalidActionText, InvalidAgentAction) as error:
                 step = trace.add_step(StepType.MODEL)
                 trace.add_event(step, EventType.ERROR, content=str(error))
                 run.fail()
+                self._finish_runtime(
+                    event_sink,
+                    run,
+                    StopReason.MODEL_ERROR,
+                    content=str(error),
+                    turn_index=turn_index,
+                )
                 return trace.to_dict()
           if turn.final:
+            if profile.require_tool_evidence and tool_evidence_count == 0:
+                step = trace.add_step(StepType.FINAL)
+                trace.add_event(
+                    step,
+                    EventType.ERROR,
+                    content="当前运行画像要求工具证据，但模型未调用任何工具",
+                )
+                run.fail()
+                self._finish_runtime(
+                    event_sink,
+                    run,
+                    StopReason.EVIDENCE_REQUIRED,
+                    turn_index=turn_index,
+                )
+                return trace.to_dict()
             step = trace.add_step(StepType.FINAL)
             run.complete()
             trace.add_event(
                 step,
                 EventType.TEXT,
                 content=turn.final_answer,
+            )
+            self._finish_runtime(
+                event_sink,
+                run,
+                StopReason.COMPLETED,
+                content=turn.final_answer,
+                turn_index=turn_index,
+                phase=(
+                    TurnPhase.VERIFY
+                    if profile.verify_before_finish
+                    else TurnPhase.FINISH
+                ),
             )
             return trace.to_dict()
 
@@ -653,9 +717,23 @@ class MicodeAgent:
                 content="model turn contains no tool calls or final answer",
             )
             run.fail()
+            self._finish_runtime(
+                event_sink,
+                run,
+                StopReason.MODEL_ERROR,
+                turn_index=turn_index,
+            )
             return trace.to_dict()
 
           run.wait_for_tool()
+          self._emit_runtime(
+              event_sink,
+              "tool_batch_started",
+              TurnPhase.ACT,
+              run,
+              turn_index=turn_index,
+              metadata={"tools": [action.tool for action in turn.actions]},
+          )
           batch_ok = self._execute_tool_batch(
               turn.actions,
               batch_id=f"batch-{turn_index}",
@@ -663,6 +741,7 @@ class MicodeAgent:
               observations=observations,
           )
           self._sync_security_metadata(run)
+          tool_evidence_count += len(turn.actions)
           if not batch_ok:
               failure_metadata = trace.events[-1].metadata if trace.events else {}
               failure_details = failure_metadata.get("details", {})
@@ -676,15 +755,101 @@ class MicodeAgent:
                       "review_id", ""
                   )
                   run.metadata["pause_reason"] = "human_review_required"
+                  self._finish_runtime(
+                      event_sink,
+                      run,
+                      StopReason.HUMAN_REVIEW,
+                      turn_index=turn_index,
+                      phase=TurnPhase.WAITING,
+                  )
               else:
                   run.fail()
+                  self._finish_runtime(
+                      event_sink,
+                      run,
+                      StopReason.TOOL_ERROR,
+                      turn_index=turn_index,
+                  )
               return trace.to_dict()
           run.resume()
+          self._emit_runtime(
+              event_sink,
+              "tool_batch_completed",
+              TurnPhase.ACT,
+              run,
+              turn_index=turn_index,
+              metadata={"tool_evidence_count": tool_evidence_count},
+          )
         
         step = trace.add_step(StepType.FINAL)
         trace.add_event(step, EventType.ERROR, content="超过最大步骤数")
         run.fail()
+        self._finish_runtime(
+            event_sink,
+            run,
+            StopReason.MAX_STEPS,
+            turn_index=profile.max_turns,
+        )
         return trace.to_dict()
+
+    def _next_turn_with_retry(
+        self,
+        task: str,
+        observations: list[str],
+        max_retries: int,
+    ) -> AgentTurn:
+        """只重试模型协议类错误，工具失败仍由权限和 Trace 处理。"""
+        attempts = 0
+        while True:
+            try:
+                return self._next_turn(task, observations)
+            except (LLMError, InvalidActionText, InvalidAgentAction):
+                if attempts >= max_retries:
+                    raise
+                attempts += 1
+
+    @staticmethod
+    def _emit_runtime(
+        sink: Optional[Callable[[RuntimeEvent], None]],
+        event_type: str,
+        phase: TurnPhase,
+        run: Run,
+        content: str = "",
+        turn_index: int = 0,
+        metadata: Optional[dict] = None,
+    ) -> None:
+        if sink is None:
+            return
+        sink(
+            RuntimeEvent(
+                type=event_type,
+                phase=phase,
+                run_id=run.id,
+                turn_index=turn_index,
+                content=content,
+                metadata=metadata or {},
+            )
+        )
+
+    def _finish_runtime(
+        self,
+        sink: Optional[Callable[[RuntimeEvent], None]],
+        run: Run,
+        reason: StopReason,
+        content: str = "",
+        turn_index: int = 0,
+        phase: TurnPhase = TurnPhase.FINISH,
+    ) -> None:
+        run.metadata["stop_reason"] = reason.value
+        self._emit_runtime(
+            sink,
+            "run_stopped",
+            phase,
+            run,
+            content=content,
+            turn_index=turn_index,
+            metadata={"stop_reason": reason.value, "status": run.status.value},
+        )
 
     def _next_turn(self, task: str, observations: list[str]) -> AgentTurn:
         """兼容新批量 LLM 和旧单 Action LLM。"""

@@ -1,6 +1,7 @@
 from dataclasses import asdict, dataclass, field
 from typing import Callable, Optional
 
+from micode.checkpoints import CheckpointStore
 from micode.hooks.manager import HookManager
 from micode.hooks.models import HookContext, HookEvent
 from micode.human_review import HumanReviewError
@@ -85,11 +86,16 @@ class ToolFailure:
 class ToolRegistry:
     """轻量工具注册表，负责工具注册、查找和统一调用。"""
 
-    def __init__(self, hook_manager: Optional[HookManager] = None) -> None:
+    def __init__(
+        self,
+        hook_manager: Optional[HookManager] = None,
+        checkpoint_store: Optional[CheckpointStore] = None,
+    ) -> None:
         self._tools: dict[str, ToolDefinition] = {}
         self.hook_manager = hook_manager or HookManager()
         self._disposers = []
         self._closed = False
+        self.checkpoint_store = checkpoint_store
 
     def register(self, tool: ToolDefinition) -> None:
         """注册工具；同名工具不允许覆盖，避免隐藏错误。"""
@@ -195,12 +201,18 @@ class ToolRegistry:
                     output=before.output or "Tool call blocked by hook",
                     metadata={
                         **before.metadata,
+                        **(
+                            {"reversible": False}
+                            if tool.capabilities.writes_workspace
+                            else {}
+                        ),
                         "hooks": before.executions,
                     },
                 ),
                 tool,
             )
 
+        checkpoint = self._create_checkpoint(tool, actual_args, run_id)
         try:
             result = tool.handler(actual_args)
             if not isinstance(result, ToolResult):
@@ -243,6 +255,13 @@ class ToolRegistry:
             default_trust_level=tool.output_trust,
             default_source=tool.source,
         )
+        if checkpoint is not None and result.ok:
+            finalized = self.checkpoint_store.finalize(checkpoint.id)
+            result.metadata["checkpoint"] = finalized.to_dict()
+            result.metadata["reversible"] = True
+        elif tool.capabilities.writes_workspace:
+            # Shell/MCP 等无法预知完整影响路径的写操作不能承诺自动回退。
+            result.metadata.setdefault("reversible", False)
 
         after = self.hook_manager.emit(
             HookContext(
@@ -262,6 +281,28 @@ class ToolRegistry:
         if hook_executions:
             result.metadata["hooks"] = hook_executions
         return _normalize_result(name, actual_args, result, tool)
+
+    def _create_checkpoint(
+        self,
+        tool: ToolDefinition,
+        args: dict,
+        run_id: str,
+    ):
+        """为可枚举目标路径的 workspace 写工具创建写前 checkpoint。"""
+        if self.checkpoint_store is None or not tool.capabilities.writes_workspace:
+            return None
+        raw_paths = args.get("paths")
+        paths = list(raw_paths) if isinstance(raw_paths, list) else []
+        if isinstance(args.get("path"), str) and args["path"].strip():
+            paths.append(args["path"])
+        if not paths:
+            return None
+        return self.checkpoint_store.create(
+            paths,
+            reason=f"before tool {tool.name}",
+            run_id=run_id,
+            tool_name=tool.name,
+        )
 
     def resume(self, review_id: str) -> ToolResult:
         """在人工批准后恢复原工具调用，批准只能消费一次。"""

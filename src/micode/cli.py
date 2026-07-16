@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 
 from micode.agent import MicodeAgent, create_llm_from_config
+from micode.checkpoints import CheckpointStore
 from micode.context.layers import ContextLayer, ContextLayerAssembler
 from micode.context.prompt_cache import PromptCacheStore
 from micode.context.review import review_context_trace_file
@@ -63,6 +64,51 @@ from micode.tools.default import create_default_tool_registry
 from micode.trace import TraceRecorder
 from micode.memory.working import WorkingMemoryStore
 from micode.workspace import Workspace
+
+
+def run_session_command(
+    action: str,
+    session_id: str,
+    session_dir: str = ".micode/sessions",
+) -> dict:
+    """检查或回放会话；resume 所需上下文也由同一份持久化数据生成。"""
+    session = SessionStore(session_dir).load(session_id)
+    messages = SessionMessageStore(session_dir).load_messages(session_id)
+    summary = SessionSummaryStore(session_dir).load(session_id)
+    if action == "inspect":
+        return {
+            "session": session.to_dict(),
+            "message_count": len(messages),
+            "summary": summary.to_dict() if summary is not None else None,
+            "resumable": True,
+        }
+    if action == "replay":
+        return {
+            "session": session.to_dict(),
+            "messages": [message.to_dict() for message in messages],
+        }
+    if action == "summary":
+        return {
+            "session_id": session.id,
+            "summary": summary.to_dict() if summary is not None else None,
+        }
+    raise ValueError(f"unknown session action: {action}")
+
+
+def run_checkpoint_command(
+    action: str,
+    checkpoint_id: str,
+    workspace_path: str = ".",
+) -> dict:
+    """预览或执行冲突安全 rewind。"""
+    store = CheckpointStore(Workspace(workspace_path))
+    if action == "inspect":
+        return store.load(checkpoint_id).to_dict()
+    if action == "preview":
+        return store.preview_rewind(checkpoint_id)
+    if action == "rewind":
+        return store.rewind(checkpoint_id)
+    raise ValueError(f"unknown checkpoint action: {action}")
 
 
 def run_task(task: str, workspace_path: str) -> dict:
@@ -705,6 +751,16 @@ def main() -> None:
     mcp_inspect_parser.add_argument("--config", default="config.toml")
     mcp_inspect_parser.add_argument("--workspace", default=".")
 
+    session_parser = subparsers.add_parser("session")
+    session_parser.add_argument("action", choices=["inspect", "replay", "summary"])
+    session_parser.add_argument("session_id")
+    session_parser.add_argument("--session-dir", default=".micode/sessions")
+
+    checkpoint_parser = subparsers.add_parser("checkpoint")
+    checkpoint_parser.add_argument("action", choices=["inspect", "preview", "rewind"])
+    checkpoint_parser.add_argument("checkpoint_id")
+    checkpoint_parser.add_argument("--workspace", default=".")
+
     args = parser.parse_args()
 
     if args.command == "fixed":
@@ -796,6 +852,20 @@ def main() -> None:
         print(json.dumps(report, ensure_ascii=False, indent=2))
     elif args.command == "mcp-inspect":
         report = run_mcp_inspect(args.config, args.workspace)
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+    elif args.command == "session":
+        report = run_session_command(
+            args.action,
+            args.session_id,
+            session_dir=args.session_dir,
+        )
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+    elif args.command == "checkpoint":
+        report = run_checkpoint_command(
+            args.action,
+            args.checkpoint_id,
+            workspace_path=args.workspace,
+        )
         print(json.dumps(report, ensure_ascii=False, indent=2))
 
 

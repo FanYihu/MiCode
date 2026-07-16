@@ -1,5 +1,6 @@
 from typing import Callable, Optional
 
+from micode.checkpoints import CheckpointStore
 from micode.hooks import HookManager, create_default_hook_manager
 from micode.human_review import HumanReviewStore
 from micode.security import SecurityState, TrustLevel
@@ -46,7 +47,8 @@ def create_default_tool_registry(
             manager=hook_manager,
             human_review_store=review_store,
             security_state=security_state,
-        )
+        ),
+        checkpoint_store=CheckpointStore(workspace),
     )
 
     registry.register(

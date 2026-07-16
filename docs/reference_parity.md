@@ -13,8 +13,8 @@
 | Hook/Permission | `hooks.py`, `permissions.py` | `hooks/`, `permissions.py` | `test_hooks.py`, `test_permission.py` | done |
 | Untrusted/Injection/Human Review | `auto_mode.py` input guard + Micode hardening | `security.py`, `human_review.py` | `test_security.py` | done |
 | MCP | `mcp.py` | `mcp/` | `test_mcp.py` | done |
-| Runtime profiles/turn kernel | `runtime_profiles.py`, `turn_kernel.py` | Stage 3 runtime package | runtime tests | planned |
-| Session replay/checkpoint/rewind | `history.py`, `session.py` | Stage 3 session/checkpoint package | recovery tests | planned |
+| Runtime profiles/turn kernel | `runtime_profiles.py`, `turn_kernel.py` | `runtime.py`, `agent.py` event bridge | `test_runtime.py` | done |
+| Session replay/checkpoint/rewind | `history.py`, `session.py` | `memory/session.py`, `checkpoints.py`, CLI | `test_session_recovery.py`, `test_checkpoints.py` | done |
 | Delegated background runtime | `background_tasks.py`, task modules | enhanced `subagents/` | subagent runtime tests | planned |
 | Expanded tool catalog | `tools/` | expanded `tools/` | tool contract tests | planned |
 | Provider fallback/readiness | adapters, retry, model registry | generic OpenAI-compatible provider | provider tests | planned |
