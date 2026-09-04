@@ -239,23 +239,6 @@ git diff --check
 
 最近一次完整验证记录：`412 passed in 3.23s`。随着 SubAgent、扩展工具、Provider readiness、TUI/headless 等后续里程碑推进，测试集会继续扩大。
 
-## 路线图
-
-```mermaid
-gantt
-    title Micode Roadmap
-    dateFormat  YYYY-MM-DD
-    axisFormat  %m-%d
-    section 已完成
-    Rename / Security / MCP      :done, 2026-07-01, 4d
-    Runtime Recovery             :done, 2026-07-05, 3d
-    section 进行中
-    SubAgent 完整委派             :active, 2026-07-08, 4d
-    section 后续
-    Expanded Tools / Provider    :2026-07-12, 4d
-    Memory Pipeline / Extensions :2026-07-16, 4d
-    TUI / Readiness / CI         :2026-07-20, 5d
-```
 
 ## 主要文档
 
